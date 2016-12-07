@@ -559,6 +559,12 @@ public class MainViewController implements Initializable {
 
     @FXML
     public void macros(KeyEvent key) {
+        if(key.getCode() == KeyCode.SPACE){
+            handlePlay();
+            
+        }
+        
+        
         if (key.getCode() == KeyCode.DELETE) {
             if (key.getSource() == tablePlaylists) {
                 deletePlaylist();
@@ -572,7 +578,7 @@ public class MainViewController implements Initializable {
 
         if (key.isControlDown()) {
             if (key.getSource() == mainPane) {
-                if (KeyCode.A == key.getCode()) {
+                if (KeyCode.N == key.getCode()) {
                     addSong();
                 }
 
