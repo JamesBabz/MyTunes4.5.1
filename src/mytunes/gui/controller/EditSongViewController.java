@@ -42,10 +42,10 @@ public class EditSongViewController implements Initializable {
      * Initializes the controller class.
      */
     @Override
-    public void initialize(URL url, ResourceBundle rb) 
+    public void initialize(URL url, ResourceBundle rb)
     {
         songModel = SongModel.getInstance();
-        
+
         contextSong = songModel.getContextSong();
         txtTitle.setText(contextSong.getTitle());
         txtArtist.setText(contextSong.getArtist());
@@ -55,7 +55,7 @@ public class EditSongViewController implements Initializable {
     }
 
     @FXML
-    private void saveChanges() 
+    private void saveChanges()
     {
         String title = txtTitle.getText();
         String artist = txtArtist.getText();
@@ -68,12 +68,13 @@ public class EditSongViewController implements Initializable {
         contextSong.setGenre(genre);
         contextSong.setRating(rate);
         songModel.editSong(contextSong);
-        
-      closeWindow();
+
+        closeWindow();
     }
 
     @FXML
-    private void closeWindow() {
+    private void closeWindow()
+    {
         Stage stage = (Stage) btnCancel.getScene().getWindow();
         // do what you have to do
         stage.close();
