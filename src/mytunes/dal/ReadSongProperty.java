@@ -14,21 +14,23 @@ import org.jaudiotagger.tag.id3.ID3v24Tag;
 /**
  * Retrieves information about a song from a given path, such as; Title, Artist,
  * Genre and Song duration.
+ *
  * @author Simon Birkedal
  */
-public class ReadSongProperty
-{
+public class ReadSongProperty {
+
     private MP3File soundFile;
     private ID3v24Tag soundTag;
 
     /**
      * Default constructor.
+     *
      * @param filePath Direct path to the song.
      * @throws CannotReadException
      * @throws IOException
      * @throws TagException
      * @throws ReadOnlyFileException
-     * @throws InvalidAudioFrameException 
+     * @throws InvalidAudioFrameException
      */
     public ReadSongProperty(String filePath) throws CannotReadException, IOException, TagException, ReadOnlyFileException, InvalidAudioFrameException
     {
@@ -38,6 +40,7 @@ public class ReadSongProperty
 
     /**
      * Gets the song file's title definition.
+     *
      * @return Returns a string representing the file's set title.
      */
     public String getTitle()
@@ -47,6 +50,7 @@ public class ReadSongProperty
 
     /**
      * Gets the song file's artist definition.
+     *
      * @return Returns a string representing the file's set artist.
      */
     public String getArtist()
@@ -56,6 +60,7 @@ public class ReadSongProperty
 
     /**
      * Gets the song file's genre definition.
+     *
      * @return Returns a string representing the file's set genre.
      */
     public String getGenre()
@@ -66,7 +71,9 @@ public class ReadSongProperty
     /**
      * Gets a songs length in total seconds, then converts it to a formatted
      * string that represents the duration in Minutes:Seconds.
-     * @return Returns a string value representing the song's duration in minutes and seconds.
+     *
+     * @return Returns a string value representing the song's duration in
+     * minutes and seconds.
      */
     public String getDuration()
     {

@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.UUID;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -34,8 +33,8 @@ import org.jaudiotagger.tag.TagException;
  *
  * @author James
  */
-public class AddSongViewController implements Initializable
-{
+public class AddSongViewController implements Initializable {
+
     private ReadSongProperty rsp;
 
     @FXML
@@ -66,20 +65,21 @@ public class AddSongViewController implements Initializable
     {
         songModel = SongModel.getInstance();
 
-        txtPath.textProperty().addListener((observable, oldValue, newValue) -> 
-        {
-            if (newValue.isEmpty())
-            {
-                txtTitle.setDisable(true);
-                txtArtist.setDisable(true);
-                txtGenre.setDisable(true);
-            }
-            else
-            {
-                txtTitle.setDisable(false);
-                txtArtist.setDisable(false);
-                txtGenre.setDisable(false);
-            }
+        txtPath.textProperty().addListener((observable, oldValue, newValue)
+                -> 
+                {
+                    if (newValue.isEmpty())
+                    {
+                        txtTitle.setDisable(true);
+                        txtArtist.setDisable(true);
+                        txtGenre.setDisable(true);
+                    }
+                    else
+                    {
+                        txtTitle.setDisable(false);
+                        txtArtist.setDisable(false);
+                        txtGenre.setDisable(false);
+                    }
         });
     }
 
