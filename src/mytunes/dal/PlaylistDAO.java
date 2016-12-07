@@ -5,7 +5,6 @@
  */
 package mytunes.dal;
 
-import mytunes.be.Song;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
@@ -15,8 +14,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import mytunes.be.Playlist;
 
 /**
@@ -24,8 +21,7 @@ import mytunes.be.Playlist;
  *
  * @author Simon Birkedal
  */
-public class PlaylistDAO
-{
+public class PlaylistDAO {
 
     public void writeObjectData(ArrayList<Playlist> associationHashMap, String fileName) throws IOException
     {

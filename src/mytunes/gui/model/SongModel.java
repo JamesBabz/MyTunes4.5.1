@@ -8,7 +8,6 @@ package mytunes.gui.model;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import mytunes.be.Song;
@@ -21,7 +20,7 @@ import mytunes.dal.SongDAO;
 public class SongModel {
 
     private Song contextSong;
-    
+
     private SongDAO songDAO;
 
     private static SongModel instance;
@@ -50,21 +49,21 @@ public class SongModel {
 
     public void editSong(Song contextSong)
     {
-       
+
         for (int i = 0; i < songs.size(); i++)
         {
-            
+
             Song song = songs.get(i);
             if (song.getId() == contextSong.getId())
             {
-                
+
                 song.setTitle(contextSong.getTitle());
                 song.setArtist(contextSong.getArtist());
                 song.setGenre(contextSong.getGenre());
                 song.setRating(contextSong.getRating());
                 //Replace the song
                 songs.set(i, song);
-                
+
             }
 
         }
@@ -78,7 +77,7 @@ public class SongModel {
 
     public void setSongs()
     {
-        
+
     }
 
     public Song getContextSong()

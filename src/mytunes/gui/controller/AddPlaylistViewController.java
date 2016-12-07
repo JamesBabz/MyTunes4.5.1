@@ -9,7 +9,6 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -29,8 +28,7 @@ public class AddPlaylistViewController implements Initializable {
     private Button closeButton;
     @FXML
     private TextField txtTitle;
-    
-    
+
     private Playlist playlist;
     private PlaylistModel plModel;
     private ObservableList<Playlist> playLists = FXCollections.observableArrayList();
@@ -42,17 +40,17 @@ public class AddPlaylistViewController implements Initializable {
     public void initialize(URL url, ResourceBundle rb)
     {
         plModel = PlaylistModel.getInstance();
-    }    
+    }
 
     @FXML
     private void addPlaylist()
     {
         String name = txtTitle.getText();
-        
+
         playlist = new Playlist(name);
         plModel.addPlaylist(playlist);
         plModel.updatePlaylistView();
-        closeWindow();   
+        closeWindow();
     }
 
     @FXML
@@ -61,5 +59,5 @@ public class AddPlaylistViewController implements Initializable {
         Stage stage = (Stage) closeButton.getScene().getWindow();
         stage.close();
     }
-    
+
 }
