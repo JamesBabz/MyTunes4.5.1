@@ -642,24 +642,19 @@ public class MainViewController implements Initializable {
     }
 
     @FXML
-<<<<<<< HEAD
-    public void macros(KeyEvent key) {
-        if(key.getCode() == KeyCode.SPACE){
-            handlePlay();
-            
-        }
-        
-        
-        if (key.getCode() == KeyCode.DELETE) {
-            if (key.getSource() == tablePlaylists) {
-=======
     public void macros(KeyEvent key)
     {
+        
+        if(key.getCode() == KeyCode.SPACE)
+        {
+            handlePlay();
+        }
+        
         if (key.getCode() == KeyCode.DELETE)
         {
             if (key.getSource() == tablePlaylists)
             {
->>>>>>> refs/remotes/origin/Development
+
                 deletePlaylist();
             }
 
@@ -667,21 +662,15 @@ public class MainViewController implements Initializable {
             {
                 deleteSong();
             }
+      }
 
-        }
-
-<<<<<<< HEAD
-        if (key.isControlDown()) {
-            if (key.getSource() == mainPane) {
-                if (KeyCode.N == key.getCode()) {
-=======
         if (key.isControlDown())
         {
             if (key.getSource() == mainPane)
             {
-                if (KeyCode.A == key.getCode())
+                if (KeyCode.N == key.getCode())
                 {
->>>>>>> refs/remotes/origin/Development
+
                     addSong();
                 }
 
@@ -692,6 +681,7 @@ public class MainViewController implements Initializable {
             }
         }
     }
+            
 
     private void nextSongInList()
     {
