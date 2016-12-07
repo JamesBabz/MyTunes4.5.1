@@ -45,12 +45,9 @@ public class EditSongViewController implements Initializable {
     public void initialize(URL url, ResourceBundle rb)
     {
         songModel = SongModel.getInstance();
+        getCurrentInfo();
 
-        contextSong = songModel.getContextSong();
-        txtTitle.setText(contextSong.getTitle());
-        txtArtist.setText(contextSong.getArtist());
-        txtGenre.setText(contextSong.getGenre());
-        txtRating.setText(contextSong.getRating() + "");
+        
 
     }
 
@@ -63,6 +60,7 @@ public class EditSongViewController implements Initializable {
         String rating = txtRating.getText();
         int rate = Integer.parseInt(rating);
 
+        
         contextSong.setTitle(title);
         contextSong.setArtist(artist);
         contextSong.setGenre(genre);
@@ -78,5 +76,14 @@ public class EditSongViewController implements Initializable {
         Stage stage = (Stage) btnCancel.getScene().getWindow();
         // do what you have to do
         stage.close();
+    }
+
+    private void getCurrentInfo()
+    {
+        contextSong = songModel.getContextSong();
+        txtTitle.setText(contextSong.getTitle());
+        txtArtist.setText(contextSong.getArtist());
+        txtGenre.setText(contextSong.getGenre());
+        txtRating.setText(contextSong.getRating() + "");
     }
 }
