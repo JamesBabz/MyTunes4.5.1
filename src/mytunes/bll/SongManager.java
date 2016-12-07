@@ -13,8 +13,8 @@ import mytunes.be.Song;
  *
  * @author Simon Birkedal
  */
-public class SongManager
-{
+public class SongManager {
+
     private Song currentSong;
     private MediaPlayer player;
 
@@ -81,6 +81,5 @@ public class SongManager
     {
         return player;
     }
-    
-    
+
 }

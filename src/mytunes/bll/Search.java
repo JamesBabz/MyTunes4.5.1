@@ -14,8 +14,7 @@ import mytunes.be.Song;
  *
  * @author Simon Birkedal
  */
-public class Search
-{
+public class Search {
 
     private List<Song> songs;
 
@@ -36,7 +35,7 @@ public class Search
      * @param searchQuery
      *
      * @return an ArrayList with the results of songs, which contains the
-     *         searchQuery.
+     * searchQuery.
      */
     public ArrayList<Song> getContains(String searchQuery)
     {
