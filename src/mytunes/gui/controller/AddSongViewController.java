@@ -109,7 +109,7 @@ public class AddSongViewController implements Initializable {
     }
 
     @FXML
-    private void browseForFile(ActionEvent event)
+    private void browseForFile()
     {
 
         FileChooser fileChooser = new FileChooser();
