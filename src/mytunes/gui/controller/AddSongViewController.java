@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -109,23 +111,30 @@ public class AddSongViewController implements Initializable {
     @FXML
     private void browseForFile(ActionEvent event)
     {
+
+        FileChooser fileChooser = new FileChooser();
+        Window win = root.getScene().getWindow();
+        File file = fileChooser.showOpenDialog(win);
+        txtPath.setText(file.getPath());
+
+        prepopulateFields(file);
+
+    }
+
+    private void prepopulateFields(File file)
+    {
+
         try
         {
-            FileChooser fileChooser = new FileChooser();
-            Window win = root.getScene().getWindow();
-            File file = fileChooser.showOpenDialog(win);
-            txtPath.setText(file.getPath());
-
             rsp = new ReadSongProperty(file.getPath());
             txtTitle.setText(rsp.getTitle());
             txtArtist.setText(rsp.getArtist());
             txtGenre.setText(rsp.getGenre());
             txtDuration.setText(rsp.getDuration());
-
         }
-        catch (CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException ex)
+        catch (CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e)
         {
-            // TODO: Handling the different exceptions.
+            Logger.getLogger(AddSongViewController.class.getName()).log(Level.SEVERE, null, e);
         }
     }
 
