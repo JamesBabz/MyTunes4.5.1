@@ -129,7 +129,8 @@ public class MainViewController implements Initializable {
     /**
      * The default contructor for this class.
      */
-    public MainViewController() {
+    public MainViewController()
+    {
         this.songsLibrary = FXCollections.observableArrayList();
         this.currentSongsInView = FXCollections.observableArrayList();
         this.playlists = FXCollections.observableArrayList();
@@ -139,14 +140,19 @@ public class MainViewController implements Initializable {
      * Loads the addSongView.
      */
     @FXML
-    public void handleAddSongButton() {
+    public void handleAddSongButton()
+    {
         addSong();
     }
 
-    private void addSong() {
-        try {
+    private void addSong()
+    {
+        try
+        {
             loadStage("AddSongView");
-        } catch (IOException ex) {
+        }
+        catch (IOException ex)
+        {
             Logger.getLogger(MainViewController.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("Simon sutter!");
         }
@@ -156,14 +162,19 @@ public class MainViewController implements Initializable {
      * Loads the playlistView.
      */
     @FXML
-    private void handleAddPlaylistButton() {
+    private void handleAddPlaylistButton()
+    {
         addPlaylist();
     }
 
-    private void addPlaylist() {
-        try {
+    private void addPlaylist()
+    {
+        try
+        {
             loadStage("AddPlaylistView");
-        } catch (IOException ex) {
+        }
+        catch (IOException ex)
+        {
             Logger.getLogger(MainViewController.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("Simon sutter!");
         }
@@ -175,10 +186,13 @@ public class MainViewController implements Initializable {
      * @param event The mouse event to listen for.
      */
     @FXML
-    public void handleOnMousePressed(MouseEvent event) {
+    public void handleOnMousePressed(MouseEvent event)
+    {
         selectedSong = tableSongs.selectionModelProperty().getValue().getSelectedItem();
-        if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
-            if (selectedSong != null) {
+        if (event.isPrimaryButtonDown() && event.getClickCount() == 2)
+        {
+            if (selectedSong != null)
+            {
                 songManager.pauseSong();
                 songManager.playSong(selectedSong, true);
 
@@ -192,17 +206,22 @@ public class MainViewController implements Initializable {
      * Plays the selected song from the currently active view table.
      */
     @FXML
-    public void handlePlay() {
+    public void handlePlay()
+    {
         // Making sure the song is never null before trying to play a song.
-        if (selectedSong == null) {
+        if (selectedSong == null)
+        {
             tableSongs.selectionModelProperty().get().select(0);
         }
 
         selectedSong = tableSongs.selectionModelProperty().getValue().getSelectedItem();
         //Play button pressed
-        if (!isPlaying) {
+        if (!isPlaying)
+        {
             songManager.playSong(selectedSong, false);
-        } else {
+        }
+        else
+        {
             songManager.pauseSong();
         }
 
@@ -217,7 +236,8 @@ public class MainViewController implements Initializable {
      * @param rb
      */
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
+    public void initialize(URL url, ResourceBundle rb)
+    {
 
         tester();
 
@@ -241,39 +261,48 @@ public class MainViewController implements Initializable {
         searchOnUpdate();
     }
 
-    private void searchOnUpdate() {
+    private void searchOnUpdate()
+    {
         txtSearch.textProperty().addListener((listener, oldVal, newVal)
-                -> {
-            ObservableList<Song> searchedSongs = FXCollections.observableArrayList();
-            searchedSongs.clear();
-            ObservableList<Song> allSongsInCurrentView = currentSongsInView;
-            if (selectedPlaylist == null || hasBrowseButtonBeenClicked) {
-                allSongsInCurrentView.setAll(songModel.getSongs());
-            } else {
-                allSongsInCurrentView.setAll(selectedPlaylist.getSongList());
-            }
+                -> 
+                {
+                    ObservableList<Song> searchedSongs = FXCollections.observableArrayList();
+                    searchedSongs.clear();
+                    ObservableList<Song> allSongsInCurrentView = currentSongsInView;
+                    if (selectedPlaylist == null || hasBrowseButtonBeenClicked)
+                    {
+                        allSongsInCurrentView.setAll(songModel.getSongs());
+                    }
+                    else
+                    {
+                        allSongsInCurrentView.setAll(selectedPlaylist.getSongList());
+                    }
 
-            for (Song song : allSongsInCurrentView) {
-                if (song.getTitle().trim().toLowerCase().contains(newVal.trim().toLowerCase())
-                        || song.getArtist().trim().toLowerCase().contains(newVal.trim().toLowerCase())
-                        || song.getGenre().trim().toLowerCase().contains(newVal.trim().toLowerCase())
-                        || String.valueOf(song.getRating()).trim().toLowerCase().contains(newVal.trim().toLowerCase())
-                        && !searchedSongs.contains(song)) {
-                    searchedSongs.add(song);
-                }
-            }
+                    for (Song song : allSongsInCurrentView)
+                    {
+                        if (song.getTitle().trim().toLowerCase().contains(newVal.trim().toLowerCase())
+                                || song.getArtist().trim().toLowerCase().contains(newVal.trim().toLowerCase())
+                                || song.getGenre().trim().toLowerCase().contains(newVal.trim().toLowerCase())
+                                || String.valueOf(song.getRating()).trim().toLowerCase().contains(newVal.trim().toLowerCase())
+                                && !searchedSongs.contains(song))
+                        {
+                            searchedSongs.add(song);
+                        }
+                    }
 
-            tableSongs.setItems(searchedSongs);
+                    tableSongs.setItems(searchedSongs);
         });
     }
 
-    private void processVolumeData() {
+    private void processVolumeData()
+    {
         sliderVolume.valueProperty().addListener(listener
-                -> {
-            songManager.getMediaPlayer().setVolume(sliderVolume.getValue() / 100);
-            Image image = new Image(getClass().getResourceAsStream("/mytunes/images/unmute.png"));
-            imgMute.setImage(image);
-            isMuted = false;
+                -> 
+                {
+                    songManager.getMediaPlayer().setVolume(sliderVolume.getValue() / 100);
+                    Image image = new Image(getClass().getResourceAsStream("/mytunes/images/unmute.png"));
+                    imgMute.setImage(image);
+                    isMuted = false;
         });
     }
 
@@ -283,7 +312,8 @@ public class MainViewController implements Initializable {
      * @param viewName The view file to be loaded.
      * @throws IOException
      */
-    private void loadStage(String viewName) throws IOException {
+    private void loadStage(String viewName) throws IOException
+    {
         primaryStage = (Stage) tableSongs.getScene().getWindow();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/mytunes/gui/view/" + viewName + ".fxml"));
         Parent root = loader.load();
@@ -301,85 +331,110 @@ public class MainViewController implements Initializable {
      *
      * @return
      */
-    public TableView<Song> getTableSongs() {
+    public TableView<Song> getTableSongs()
+    {
         return tableSongs;
     }
 
-    public void setSongs() {
+    public void setSongs()
+    {
         songsLibrary.addAll(songModel.getSongs());
     }
 
-    public ObservableList<Playlist> getPlaylists() {
+    public ObservableList<Playlist> getPlaylists()
+    {
         return playlists;
     }
 
-    public TableView<Playlist> getTablePlaylists() {
+    public TableView<Playlist> getTablePlaylists()
+    {
         return tablePlaylists;
     }
 
-    public void setPlaylists() {
+    public void setPlaylists()
+    {
         playlists = playlistModel.getPlaylists();
     }
 
-    private void changePlayButton(boolean playing) {
+    private void changePlayButton(boolean playing)
+    {
         Image image;
-        if (playing) {
+        if (playing)
+        {
             image = new Image(getClass().getResourceAsStream("/mytunes/images/play.png"));
             imgPlay.setImage(image);
             isPlaying = false;
-        } else {
+        }
+        else
+        {
             image = new Image(getClass().getResourceAsStream("/mytunes/images/pause.png"));
             imgPlay.setImage(image);
             isPlaying = true;
         }
     }
 
-    private void processMediaInfo() {
-        try {
+    private void processMediaInfo()
+    {
+        try
+        {
             songManager.getMediaPlayer().currentTimeProperty().addListener((listener, oldVal, newVal)
-                    -> {
-                long minutes = (long) newVal.toMinutes();
-                long seconds = (long) (newVal.toSeconds() % 60);
-                this.lblTimeElapsed.setText(String.format("%02d:%02d", minutes, seconds));
+                    -> 
+                    {
+                        long minutes = (long) newVal.toMinutes();
+                        long seconds = (long) (newVal.toSeconds() % 60);
+                        this.lblTimeElapsed.setText(String.format("%02d:%02d", minutes, seconds));
 
-                double timeElapsed = newVal.toMillis() / songManager.getSongLength().toMillis();
-                this.barMediaTimer.setProgress(timeElapsed);
-                if(newVal.toMillis()>= songManager.getSongLength().toMillis())
-                {
-                nextSongInList();
-                }
+                        double timeElapsed = newVal.toMillis() / songManager.getSongLength().toMillis();
+                        this.barMediaTimer.setProgress(timeElapsed);
+                        if (newVal.toMillis() >= songManager.getSongLength().toMillis())
+                        {
+                            nextSongInList();
+                        }
             });
 
-            if (!isPlaying) {
+            if (!isPlaying)
+            {
                 lblSongPlaying.setText(songManager.getCurrentlyPlayingSong().getTitle());
-            } else {
+            }
+            else
+            {
                 lblSongPlaying.setText(songManager.getCurrentlyPlayingSong().getTitle());
             }
 
             lblSongDuration.setText(songManager.getCurrentlyPlayingSong().getDuration());
-        } finally {
+        }
+        finally
+        {
 
         }
     }
 
     @FXML
-    public void handleNextSong() {
-     nextSongInList();
+    public void handleNextSong()
+    {
+        nextSongInList();
     }
 
     @FXML
-    public void handlePreviousSong() {
+    public void handlePreviousSong()
+    {
         TableViewSelectionModel<Song> selectionModel = tableSongs.selectionModelProperty().getValue();
         int selectedSongIndex = selectionModel.getSelectedIndex();
         int tableSongsTotalItems = tableSongs.getItems().size() - 1;
 
-        if (songManager.getSongTimeElapsed().toMillis() <= 3500.0) {
-            if (selectedSongIndex == 0 || selectedSong == null) {
+        if (songManager.getSongTimeElapsed().toMillis() <= 3500.0)
+        {
+            if (selectedSongIndex == 0 || selectedSong == null)
+            {
                 selectionModel.clearAndSelect(tableSongsTotalItems);
-            } else {
+            }
+            else
+            {
                 selectionModel.clearAndSelect(selectedSongIndex - 1);
             }
-        } else {
+        }
+        else
+        {
             selectionModel.clearAndSelect(selectedSongIndex);
         }
 
@@ -394,7 +449,8 @@ public class MainViewController implements Initializable {
     }
 
     @FXML
-    private void handleEditSong(ActionEvent event) throws IOException {
+    private void handleEditSong(ActionEvent event) throws IOException
+    {
         handleContextSong();
         Stage primStage = (Stage) tableSongs.getScene().getWindow();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/mytunes/gui/view/EditSongView.fxml"));
@@ -413,24 +469,28 @@ public class MainViewController implements Initializable {
     }
 
     @FXML
-    private void handleDeleteSong(ActionEvent event) {
+    private void handleDeleteSong(ActionEvent event)
+    {
         deleteSong();
 
     }
 
-    private void deleteSong() {
+    private void deleteSong()
+    {
         songModel.getSongs().remove(selectedSong);
         tableSongs.getItems().remove(selectedSong);
 
     }
 
-    private void handleContextSong() {
+    private void handleContextSong()
+    {
 
         songModel.setContextSong(selectedSong);
 
     }
 
-    private void handleAddSongToPlaylist(Playlist playlist) {
+    private void handleAddSongToPlaylist(Playlist playlist)
+    {
 //        selectedPlaylist = tablePlaylists.getSelectionModel().getSelectedItem();
 //        if (selectedPlaylist != null)
 //        {
@@ -442,16 +502,21 @@ public class MainViewController implements Initializable {
     }
 
     @FXML
-    private void handleOnSelectedPlaylist(MouseEvent event) {
+    private void handleOnSelectedPlaylist(MouseEvent event)
+    {
         selectedPlaylist = tablePlaylists.getSelectionModel().getSelectedItem();
-        if (selectedPlaylist != null) {
+        if (selectedPlaylist != null)
+        {
             currentSongsInView.clear();
 
-            for (Song song : selectedPlaylist.getSongList()) {
-                if (!currentSongsInView.contains(song)) {
+            for (Song song : selectedPlaylist.getSongList())
+            {
+                if (!currentSongsInView.contains(song))
+                {
                     currentSongsInView.add(song);
                 }
-                if (!songModel.getSongs().contains(song)) {
+                if (!songModel.getSongs().contains(song))
+                {
                     currentSongsInView.remove(song);
                 }
             }
@@ -460,25 +525,33 @@ public class MainViewController implements Initializable {
         hasBrowseButtonBeenClicked = false;
     }
 
-    private void initialLoad() {
-        try {
+    private void initialLoad()
+    {
+        try
+        {
             songModel.loadSongData();
             playlistModel.loadPlaylistData();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             //Logger.getLogger(MainViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
         tableSongs.setItems(songModel.getSongs());
     }
 
     @FXML
-    private void handleMuteSound() {
+    private void handleMuteSound()
+    {
         Image image;
-        if (!isMuted) {
+        if (!isMuted)
+        {
             sliderVolumeValue = sliderVolume.getValue();
             image = new Image(getClass().getResourceAsStream("/mytunes/images/mute.png"));
             sliderVolume.setValue(0.0);
             isMuted = true;
-        } else {
+        }
+        else
+        {
             image = new Image(getClass().getResourceAsStream("/mytunes/images/unmute.png"));
             sliderVolume.setValue(sliderVolumeValue);
             isMuted = false;
@@ -488,18 +561,21 @@ public class MainViewController implements Initializable {
     }
 
     @FXML
-    private void handleClearSearch(MouseEvent event) {
+    private void handleClearSearch(MouseEvent event)
+    {
         txtSearch.setText("");
 
     }
 
     @FXML
-    private void handleSetTimeElapsed(MouseEvent event) {
+    private void handleSetTimeElapsed(MouseEvent event)
+    {
 
     }
 
     @FXML
-    private void handleBrowseOnAction(ActionEvent event) {
+    private void handleBrowseOnAction(ActionEvent event)
+    {
         tableSongs.requestFocus();
         tableSongs.setItems(songModel.getSongs());
         hasBrowseButtonBeenClicked = true;
@@ -507,32 +583,38 @@ public class MainViewController implements Initializable {
     }
 
     @FXML
-    private void DeletePlaylist(ActionEvent event) {
+    private void DeletePlaylist(ActionEvent event)
+    {
 
         deletePlaylist();
 
     }
 
-    private void deletePlaylist() {
+    private void deletePlaylist()
+    {
         PlaylistModel.getInstance().getPlaylists().remove(selectedPlaylist);
         tablePlaylists.getItems().remove(selectedPlaylist);
     }
 
     @FXML
-    private void updatePLMenu() {
+    private void updatePLMenu()
+    {
         List<MenuItem> playlistSubMenu = new ArrayList<>();
-        for (Playlist playlist : playlists) {
+        for (Playlist playlist : playlists)
+        {
             MenuItem item = new MenuItem(playlist.getTitle());
             item.setOnAction(new EventHandler<ActionEvent>() {
 
                 @Override
-                public void handle(ActionEvent event) {
+                public void handle(ActionEvent event)
+                {
                     handleAddSongToPlaylist(playlist);
                 }
             });
             playlistSubMenu.add(item);
         }
-        if (playlistSubMenu.isEmpty()) {
+        if (playlistSubMenu.isEmpty())
+        {
             MenuItem empty = new MenuItem("<Empty>");
             empty.setDisable(true);
             menuAddToPL.getItems().set(0, empty);
@@ -541,13 +623,15 @@ public class MainViewController implements Initializable {
         menuAddToPL.getItems().setAll(playlistSubMenu);
     }
 
-    public void tester() {
+    public void tester()
+    {
         barMediaTimer.setDisable(false);
     }
 
     //Seeks on mouse release on the progress bar
     @FXML
-    private void dragDone(MouseEvent event) {
+    private void dragDone(MouseEvent event)
+    {
         double mousePos = event.getX();
         double width = barMediaTimer.getWidth();
         double diff = 100 / width * mousePos;
@@ -558,51 +642,63 @@ public class MainViewController implements Initializable {
     }
 
     @FXML
-    public void macros(KeyEvent key) {
-        if (key.getCode() == KeyCode.DELETE) {
-            if (key.getSource() == tablePlaylists) {
+    public void macros(KeyEvent key)
+    {
+        if (key.getCode() == KeyCode.DELETE)
+        {
+            if (key.getSource() == tablePlaylists)
+            {
                 deletePlaylist();
             }
 
-            if (key.getSource() == tableSongs) {
+            if (key.getSource() == tableSongs)
+            {
                 deleteSong();
             }
 
         }
 
-        if (key.isControlDown()) {
-            if (key.getSource() == mainPane) {
-                if (KeyCode.A == key.getCode()) {
+        if (key.isControlDown())
+        {
+            if (key.getSource() == mainPane)
+            {
+                if (KeyCode.A == key.getCode())
+                {
                     addSong();
                 }
 
-                if (KeyCode.P == key.getCode()) {
+                if (KeyCode.P == key.getCode())
+                {
                     addPlaylist();
                 }
             }
         }
     }
 
-    private void nextSongInList() {
-         
-            TableViewSelectionModel<Song> selectionModel = tableSongs.selectionModelProperty().getValue();
-            int selectedSongIndex = selectionModel.getSelectedIndex();
-            int tableSongsTotalItems = tableSongs.getItems().size() - 1;
+    private void nextSongInList()
+    {
 
-            if (selectedSongIndex == tableSongsTotalItems || selectedSong == null) {
-                selectionModel.clearAndSelect(0);
-            } else {
-                selectionModel.clearAndSelect(selectedSongIndex + 1);
-            }
+        TableViewSelectionModel<Song> selectionModel = tableSongs.selectionModelProperty().getValue();
+        int selectedSongIndex = selectionModel.getSelectedIndex();
+        int tableSongsTotalItems = tableSongs.getItems().size() - 1;
 
-            selectedSong = selectionModel.getSelectedItem();
+        if (selectedSongIndex == tableSongsTotalItems || selectedSong == null)
+        {
+            selectionModel.clearAndSelect(0);
+        }
+        else
+        {
+            selectionModel.clearAndSelect(selectedSongIndex + 1);
+        }
 
-            songManager.pauseSong();
-            songManager.playSong(selectedSong, true);
-            songManager.getMediaPlayer().setVolume(sliderVolume.getValue() / 100);
+        selectedSong = selectionModel.getSelectedItem();
 
-            changePlayButton(false);
-            processMediaInfo(); 
+        songManager.pauseSong();
+        songManager.playSong(selectedSong, true);
+        songManager.getMediaPlayer().setVolume(sliderVolume.getValue() / 100);
+
+        changePlayButton(false);
+        processMediaInfo();
 
     }
 

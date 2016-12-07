@@ -2,24 +2,24 @@ package mytunes.be;
 
 import java.io.Serializable;
 import java.util.UUID;
+
 /**
  *
  * @author Simon Birkedal
  */
-public class Song implements Serializable{
+public class Song implements Serializable {
 
-    private String id;
+    private final String id;
     private String title;
     private String artist;
     private String genre;
-    private String duration;
+    private final String duration;
     private int rating;
-    private String path;
+    private final String path;
 
     /**
      * The default constructor for the song.
      *
-     * @param id Gets an unique ID.
      * @param title The title of the song.
      * @param artist The artist's name.
      * @param genre The song's genre.
@@ -38,10 +38,10 @@ public class Song implements Serializable{
         this.rating = rating;
         this.path = path;
     }
-    
 
     /**
      * Gets the id of the song.
+     *
      * @return Returns an integer value representing the id of this song.
      */
     public String getId()
@@ -51,6 +51,7 @@ public class Song implements Serializable{
 
     /**
      * Gets the title of this song.
+     *
      * @return Returns the song's title.
      */
     public String getTitle()
@@ -60,6 +61,7 @@ public class Song implements Serializable{
 
     /**
      * Gets the artist of the song.
+     *
      * @return Returns the song's artist name.
      */
     public String getArtist()
@@ -69,6 +71,7 @@ public class Song implements Serializable{
 
     /**
      * Gets the genre of the song.
+     *
      * @return Returns the genre represented by a string.
      */
     public String getGenre()
@@ -79,6 +82,7 @@ public class Song implements Serializable{
     // Needs rework, probably going to use a TimeSpan object.
     /**
      * Gets the duration of the song.
+     *
      * @return Returns the duration of the song.
      */
     public String getDuration()
@@ -102,22 +106,24 @@ public class Song implements Serializable{
         return rating;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(String title)
+    {
         this.title = title;
     }
 
-    public void setArtist(String artist) {
+    public void setArtist(String artist)
+    {
         this.artist = artist;
     }
 
-    public void setGenre(String genre) {
+    public void setGenre(String genre)
+    {
         this.genre = genre;
     }
 
-    public void setRating(int rating) {
+    public void setRating(int rating)
+    {
         this.rating = rating;
     }
-    
-    
 
 }
