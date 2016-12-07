@@ -21,9 +21,6 @@ import mytunes.gui.model.SongModel;
  */
 public class MyTunes extends Application {
     
-    private SongModel songModel;
-    private PlaylistModel playlistModel;
-
     @Override
     public void start(Stage stage) throws Exception
     {
@@ -39,8 +36,8 @@ public class MyTunes extends Application {
             @Override
             public void handle(final WindowEvent arg0)
             {
-                songModel.getInstance().saveSongData();
-                playlistModel.getInstance().savePlaylistData();
+                SongModel.getInstance().saveSongData();
+                PlaylistModel.getInstance().savePlaylistData();
                 System.exit(0);
             }
         });
