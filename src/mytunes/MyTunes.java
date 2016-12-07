@@ -32,6 +32,8 @@ public class MyTunes extends Application {
         Scene scene = new Scene(root);
 
         stage.setScene(scene);
+        stage.setMinWidth(820);
+        stage.setMinHeight(600);
         stage.show();
         stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
