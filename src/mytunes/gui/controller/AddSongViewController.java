@@ -89,7 +89,6 @@ public class AddSongViewController implements Initializable {
     private void closeWindow()
     {
         Stage stage = (Stage) closeButton.getScene().getWindow();
-        // do what you have to do
         stage.close();
     }
 
