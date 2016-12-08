@@ -74,6 +74,7 @@ public class PlaylistModel {
     {
         playlists.clear();
         playlists.addAll(playlistDAO.readObjectData("PlaylistData.dat"));
+        System.out.println("LOAD");
     }
 
     public void savePlaylistData()

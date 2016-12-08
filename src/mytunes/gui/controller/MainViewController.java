@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,7 +17,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
@@ -43,7 +46,6 @@ import mytunes.be.Playlist;
 import mytunes.be.Song;
 import mytunes.bll.PlaylistManager;
 import mytunes.bll.SongManager;
-import mytunes.dal.DataTableAssociation;
 import mytunes.gui.model.PlaylistModel;
 import mytunes.gui.model.SongModel;
 
@@ -56,7 +58,6 @@ public class MainViewController implements Initializable {
 
     private SongManager songManager;
     private PlaylistManager playlistManager;
-    private DataTableAssociation dataAssociation;
     private final ObservableList<Song> songsLibrary;
     private ObservableList<Song> currentSongsInView;
     private ObservableList<Playlist> playlists;
@@ -133,11 +134,11 @@ public class MainViewController implements Initializable {
      */
     public MainViewController()
     {
+        this.hasBrowseButtonBeenClicked = true;
         songManager = new SongManager();
         playlistManager = new PlaylistManager();
         songModel = SongModel.getInstance();
         playlistModel = PlaylistModel.getInstance();
-        this.dataAssociation = DataTableAssociation.getInstance();
         this.songsLibrary = FXCollections.observableArrayList();
         this.currentSongsInView = FXCollections.observableArrayList();
         this.playlists = FXCollections.observableArrayList();
@@ -236,31 +237,6 @@ public class MainViewController implements Initializable {
 
         changePlayButton(isPlaying);
         processMediaInfo();
-        writeDataAssociation();
-    }
-
-    public void writeDataAssociation()
-    {
-        String dataString = "";
-        for (int pl = 0; pl < playlists.size(); pl++)
-        {
-            for (Song song : playlists.get(pl).getSongList())
-            {
-                String playlistID = playlists.get(pl).getId().toString();
-                String songID = String.valueOf(song.getId());
-                String dataCode = playlistID + "," + songID + System.lineSeparator();
-                if (!dataString.contains(dataCode))
-                {
-                    dataString += dataCode;
-                }
-            }
-        }
-        dataAssociation.writeTableData(dataString, 0, "Association.txt");
-    }
-
-    public void readDataAssociation()
-    {
-
     }
 
     /**
@@ -492,14 +468,51 @@ public class MainViewController implements Initializable {
 
     private void deleteSong()
     {
-        if (tableSongs.getItems() == songsLibrary)
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Delete song");
+        alert.setHeaderText("Do you want to delete this song?");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK)
         {
-            songsLibrary.remove(selectedSong);
+            if (tableSongs.getItems() == songsLibrary)
+            {
+                selectedPlaylist.getSongList().remove(selectedSong);
+                tableSongs.getItems().remove(selectedSong);
+
+            }
+            else
+            {
+                
+                tableSongs.getItems().remove(selectedSong);
+
+                deleteFromLibrary();
+
+            }
         }
+        else
+        {
+            alert.close();
+        }
+    }
 
-        selectedPlaylist.getSongList().remove(selectedSong);
-        tableSongs.getItems().remove(selectedSong);
-
+    private void deleteFromLibrary()
+    {
+        ArrayList<Song> toBeDeleted = new ArrayList<>();
+        for (Playlist playlist : playlists)
+        {
+            for (Song song : playlist.getSongList())
+            {
+                if (song.getId() == selectedSong.getId())
+                {
+                    toBeDeleted.add(song);
+                }
+            }
+            if (!toBeDeleted.isEmpty())
+            {
+                playlist.getSongList().removeAll(toBeDeleted);
+            }
+        }
     }
 
     private void handleContextSong()
@@ -520,29 +533,17 @@ public class MainViewController implements Initializable {
         selectedPlaylist = tablePlaylists.getSelectionModel().getSelectedItem();
         if (selectedPlaylist != null)
         {
+            currentSongsInView.clear();
             if (!selectedPlaylist.getSongList().isEmpty())
             {
-                ArrayList<String> fileList = dataAssociation.readTableData("Association.txt");
-                for (String string : fileList)
+                for (Song song : selectedPlaylist.getSongList())
                 {
-                    System.out.println(string);
+                    if (!currentSongsInView.contains(song))
+                    {
+                        currentSongsInView.add(song);
+                    }
                 }
-            }
-
-            currentSongsInView.clear();
-
-            for (Song song : selectedPlaylist.getSongList())
-            {
-                if (!currentSongsInView.contains(song))
-                {
-                    currentSongsInView.add(song);
-                }
-                if (!songModel.getSongs().contains(song))
-                {
-                    currentSongsInView.remove(song);
-                }
-            }
-            hasBrowseButtonBeenClicked = false;
+            }hasBrowseButtonBeenClicked = false;
             tableSongs.setItems(currentSongsInView);
         }
     }
