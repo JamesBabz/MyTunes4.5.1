@@ -391,14 +391,11 @@ public class MainViewController implements Initializable {
 
                         double timeElapsed = newVal.toMillis() / songManager.getSongLength().toMillis();
                         this.barMediaTimer.setProgress(timeElapsed);
-                        if (songManager.getCurrentlyPlayingSong().getDuration().isEmpty() && barMediaTimer.getProgress() >= 0.999)
+                        if (songManager.getCurrentlyPlayingSong().getDuration().isEmpty() && barMediaTimer.getProgress() >= 0.999
+                                || !songManager.getCurrentlyPlayingSong().getDuration().isEmpty() && barMediaTimer.getProgress() == 1)
                         {
                             prevNextSong(true);
 
-                        }
-                        else if (!songManager.getCurrentlyPlayingSong().getDuration().isEmpty() && barMediaTimer.getProgress() == 1)
-                        {
-                            prevNextSong(true);
                         }
             });
 
@@ -647,6 +644,17 @@ public class MainViewController implements Initializable {
         {
             handlePlay();
         }
+        if (selectedSong != null)
+        {
+            if (key.getCode() == KeyCode.UP)
+            {
+                moveSong(true);
+            }
+            if (key.getCode() == KeyCode.DOWN)
+            {
+                moveSong(false);
+            }
+        }
 
         if (key.getCode() == KeyCode.DELETE)
         {
@@ -719,6 +727,35 @@ public class MainViewController implements Initializable {
 
         changePlayButton(false);
         processMediaInfo();
+    }
+
+    public void moveSong(boolean up)
+    {
+
+        System.out.println(tableSongs.getSelectionModel().getSelectedIndex());
+        int currIndex = tableSongs.getSelectionModel().getSelectedIndex();
+        int changeIndex = currIndex;
+        boolean change = false;
+        if (up && currIndex != 0)
+        {
+            changeIndex = currIndex - 1;
+            change = true;
+        }
+        else if (!up && currIndex != tableSongs.getItems().size() - 1)
+        {
+            changeIndex = currIndex + 1;
+            change = true;
+        }
+
+        if (change)
+        {
+            Song changeSong = tableSongs.getItems().get(changeIndex);
+            tableSongs.getItems().set(changeIndex, selectedSong);
+            tableSongs.getItems().set(currIndex, changeSong);
+            selectedSong = tableSongs.getItems().get(changeIndex);
+            selectedPlaylist.getSongList().set(changeIndex, selectedSong);
+            selectedPlaylist.getSongList().set(currIndex, changeSong);
+        }
     }
 
 }
