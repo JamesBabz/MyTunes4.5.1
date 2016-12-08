@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,7 +17,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
@@ -131,6 +134,11 @@ public class MainViewController implements Initializable {
      */
     public MainViewController()
     {
+        this.hasBrowseButtonBeenClicked = true;
+        songManager = new SongManager();
+        playlistManager = new PlaylistManager();
+        songModel = SongModel.getInstance();
+        playlistModel = PlaylistModel.getInstance();
         this.songsLibrary = FXCollections.observableArrayList();
         this.currentSongsInView = FXCollections.observableArrayList();
         this.playlists = FXCollections.observableArrayList();
@@ -189,9 +197,10 @@ public class MainViewController implements Initializable {
     public void handleOnMousePressed(MouseEvent event)
     {
         selectedSong = tableSongs.selectionModelProperty().getValue().getSelectedItem();
-        if (event.isPrimaryButtonDown() && event.getClickCount() == 2)
+
+        if (selectedSong != null)
         {
-            if (selectedSong != null)
+            if (event.isPrimaryButtonDown() && event.getClickCount() == 2)
             {
                 songManager.pauseSong();
                 songManager.playSong(selectedSong, true);
@@ -199,6 +208,7 @@ public class MainViewController implements Initializable {
                 changePlayButton(false);
                 processMediaInfo();
             }
+
         }
     }
 
@@ -238,13 +248,6 @@ public class MainViewController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb)
     {
-
-        tester();
-
-        songManager = new SongManager();
-        playlistManager = new PlaylistManager();
-        songModel = SongModel.getInstance();
-        playlistModel = PlaylistModel.getInstance();
         colTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
         colArtist.setCellValueFactory(new PropertyValueFactory<>("artist"));
         colGenre.setCellValueFactory(new PropertyValueFactory<>("genre"));
@@ -259,6 +262,7 @@ public class MainViewController implements Initializable {
         isPlaying = false;
         processVolumeData();
         searchOnUpdate();
+
     }
 
     private void searchOnUpdate()
@@ -310,6 +314,7 @@ public class MainViewController implements Initializable {
      * Loads a new view on top of the main stage.
      *
      * @param viewName The view file to be loaded.
+     *
      * @throws IOException
      */
     private void loadStage(String viewName) throws IOException
@@ -386,9 +391,14 @@ public class MainViewController implements Initializable {
 
                         double timeElapsed = newVal.toMillis() / songManager.getSongLength().toMillis();
                         this.barMediaTimer.setProgress(timeElapsed);
-                        if (newVal.toMillis() >= songManager.getSongLength().toMillis())
+                        if (songManager.getCurrentlyPlayingSong().getDuration().isEmpty() && barMediaTimer.getProgress() >= 0.999)
                         {
-                            nextSongInList();
+                            prevNextSong(true);
+
+                        }
+                        else if (!songManager.getCurrentlyPlayingSong().getDuration().isEmpty() && barMediaTimer.getProgress() == 1)
+                        {
+                            prevNextSong(true);
                         }
             });
 
@@ -412,74 +422,75 @@ public class MainViewController implements Initializable {
     @FXML
     public void handleNextSong()
     {
-        nextSongInList();
+        prevNextSong(true);
     }
 
     @FXML
     public void handlePreviousSong()
     {
-        TableViewSelectionModel<Song> selectionModel = tableSongs.selectionModelProperty().getValue();
-        int selectedSongIndex = selectionModel.getSelectedIndex();
-        int tableSongsTotalItems = tableSongs.getItems().size() - 1;
-
-        if (songManager.getSongTimeElapsed().toMillis() <= 3500.0)
-        {
-            if (selectedSongIndex == 0 || selectedSong == null)
-            {
-                selectionModel.clearAndSelect(tableSongsTotalItems);
-            }
-            else
-            {
-                selectionModel.clearAndSelect(selectedSongIndex - 1);
-            }
-        }
-        else
-        {
-            selectionModel.clearAndSelect(selectedSongIndex);
-        }
-
-        selectedSong = selectionModel.getSelectedItem();
-
-        songManager.pauseSong();
-        songManager.playSong(selectedSong, true);
-        songManager.getMediaPlayer().setVolume(sliderVolume.getValue() / 100);
-
-        changePlayButton(false);
-        processMediaInfo();
+        prevNextSong(false);
     }
 
     @FXML
     private void handleEditSong() throws IOException
     {
         handleContextSong();
-        Stage primStage = (Stage) tableSongs.getScene().getWindow();
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/mytunes/gui/view/EditSongView.fxml"));
-        Parent root = loader.load();
-
-        EditSongViewController editSongViewController = loader.getController();
-
-        Stage editSongViewStage = new Stage();
-        editSongViewStage.setScene(new Scene(root));
-
-        editSongViewStage.initModality(Modality.WINDOW_MODAL);
-        editSongViewStage.initOwner(primStage);
-
-        editSongViewStage.show();
-
+        loadStage("EditSongView");
     }
 
     @FXML
     private void handleDeleteSong()
     {
         deleteSong();
-
     }
 
     private void deleteSong()
     {
-        songModel.getSongs().remove(selectedSong);
-        tableSongs.getItems().remove(selectedSong);
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Delete song");
+        alert.setHeaderText("Do you want to delete this song?");
 
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK)
+        {
+            if (tableSongs.getItems() == songsLibrary)
+            {
+                selectedPlaylist.getSongList().remove(selectedSong);
+                tableSongs.getItems().remove(selectedSong);
+
+            }
+            else
+            {
+
+                tableSongs.getItems().remove(selectedSong);
+
+                deleteFromLibrary();
+
+            }
+        }
+        else
+        {
+            alert.close();
+        }
+    }
+
+    private void deleteFromLibrary()
+    {
+        ArrayList<Song> toBeDeleted = new ArrayList<>();
+        for (Playlist playlist : playlists)
+        {
+            for (Song song : playlist.getSongList())
+            {
+                if (song.getId() == selectedSong.getId())
+                {
+                    toBeDeleted.add(song);
+                }
+            }
+            if (!toBeDeleted.isEmpty())
+            {
+                playlist.getSongList().removeAll(toBeDeleted);
+            }
+        }
     }
 
     private void handleContextSong()
@@ -501,21 +512,19 @@ public class MainViewController implements Initializable {
         if (selectedPlaylist != null)
         {
             currentSongsInView.clear();
-
-            for (Song song : selectedPlaylist.getSongList())
+            if (!selectedPlaylist.getSongList().isEmpty())
             {
-                if (!currentSongsInView.contains(song))
+                for (Song song : selectedPlaylist.getSongList())
                 {
-                    currentSongsInView.add(song);
-                }
-                if (!songModel.getSongs().contains(song))
-                {
-                    currentSongsInView.remove(song);
+                    if (!currentSongsInView.contains(song))
+                    {
+                        currentSongsInView.add(song);
+                    }
                 }
             }
+            hasBrowseButtonBeenClicked = false;
+            tableSongs.setItems(currentSongsInView);
         }
-        tableSongs.setItems(currentSongsInView);
-        hasBrowseButtonBeenClicked = false;
     }
 
     private void initialLoad()
@@ -529,7 +538,7 @@ public class MainViewController implements Initializable {
         {
             Logger.getLogger(MainViewController.class.getName()).log(Level.SEVERE, null, e);
         }
-        tableSongs.setItems(songModel.getSongs());
+
     }
 
     @FXML
@@ -586,6 +595,7 @@ public class MainViewController implements Initializable {
     private void deletePlaylist()
     {
         PlaylistModel.getInstance().getPlaylists().remove(selectedPlaylist);
+        playlists.remove(selectedPlaylist);
         tablePlaylists.getItems().remove(selectedPlaylist);
     }
 
@@ -616,11 +626,6 @@ public class MainViewController implements Initializable {
         menuAddToPL.getItems().setAll(playlistSubMenu);
     }
 
-    public void tester()
-    {
-        barMediaTimer.setDisable(false);
-    }
-
     //Seeks on mouse release on the progress bar
     @FXML
     private void dragDone(MouseEvent event)
@@ -637,12 +642,12 @@ public class MainViewController implements Initializable {
     @FXML
     public void macros(KeyEvent key)
     {
-        
-        if(key.getCode() == KeyCode.SPACE)
+
+        if (key.getCode() == KeyCode.SPACE)
         {
             handlePlay();
         }
-        
+
         if (key.getCode() == KeyCode.DELETE)
         {
             if (key.getSource() == tablePlaylists)
@@ -655,7 +660,7 @@ public class MainViewController implements Initializable {
             {
                 deleteSong();
             }
-      }
+        }
 
         if (key.isControlDown())
         {
@@ -663,7 +668,6 @@ public class MainViewController implements Initializable {
             {
                 if (KeyCode.N == key.getCode())
                 {
-
                     addSong();
                 }
 
@@ -674,24 +678,39 @@ public class MainViewController implements Initializable {
             }
         }
     }
-            
 
-    private void nextSongInList()
+    private void prevNextSong(boolean next)
     {
-
         TableViewSelectionModel<Song> selectionModel = tableSongs.selectionModelProperty().getValue();
         int selectedSongIndex = selectionModel.getSelectedIndex();
         int tableSongsTotalItems = tableSongs.getItems().size() - 1;
 
-        if (selectedSongIndex == tableSongsTotalItems || selectedSong == null)
+        if (next)
         {
-            selectionModel.clearAndSelect(0);
+            if (selectedSongIndex == tableSongsTotalItems || selectedSong == null)
+            {
+                selectionModel.clearAndSelect(0);
+            }
+            else
+            {
+                selectionModel.clearAndSelect(selectedSongIndex + 1);
+            }
+        }
+        else if (songManager.getSongTimeElapsed().toMillis() <= 3500.0)
+        {
+            if (selectedSongIndex == 0 || selectedSong == null)
+            {
+                selectionModel.clearAndSelect(tableSongsTotalItems);
+            }
+            else
+            {
+                selectionModel.clearAndSelect(selectedSongIndex - 1);
+            }
         }
         else
         {
-            selectionModel.clearAndSelect(selectedSongIndex + 1);
+            selectionModel.clearAndSelect(selectedSongIndex);
         }
-
         selectedSong = selectionModel.getSelectedItem();
 
         songManager.pauseSong();
@@ -700,7 +719,6 @@ public class MainViewController implements Initializable {
 
         changePlayButton(false);
         processMediaInfo();
-
     }
 
 }
