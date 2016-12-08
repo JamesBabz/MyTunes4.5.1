@@ -55,7 +55,7 @@ public class MainViewController implements Initializable {
 
     private SongManager songManager;
     private PlaylistManager playlistManager;
-    private ObservableList<Song> songsLibrary;
+    private final ObservableList<Song> songsLibrary;
     private ObservableList<Song> currentSongsInView;
     private ObservableList<Playlist> playlists;
     private SongModel songModel;
@@ -449,7 +449,7 @@ public class MainViewController implements Initializable {
     }
 
     @FXML
-    private void handleEditSong(ActionEvent event) throws IOException
+    private void handleEditSong() throws IOException
     {
         handleContextSong();
         Stage primStage = (Stage) tableSongs.getScene().getWindow();
@@ -469,7 +469,7 @@ public class MainViewController implements Initializable {
     }
 
     @FXML
-    private void handleDeleteSong(ActionEvent event)
+    private void handleDeleteSong()
     {
         deleteSong();
 
@@ -491,18 +491,11 @@ public class MainViewController implements Initializable {
 
     private void handleAddSongToPlaylist(Playlist playlist)
     {
-//        selectedPlaylist = tablePlaylists.getSelectionModel().getSelectedItem();
-//        if (selectedPlaylist != null)
-//        {
-//            playlistManager.addSong(selectedPlaylist, selectedSong);
-//        }
-
         playlistManager.addSong(playlist, selectedSong);
-
     }
 
     @FXML
-    private void handleOnSelectedPlaylist(MouseEvent event)
+    private void handleOnSelectedPlaylist()
     {
         selectedPlaylist = tablePlaylists.getSelectionModel().getSelectedItem();
         if (selectedPlaylist != null)
@@ -534,7 +527,7 @@ public class MainViewController implements Initializable {
         }
         catch (Exception e)
         {
-            //Logger.getLogger(MainViewController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MainViewController.class.getName()).log(Level.SEVERE, null, e);
         }
         tableSongs.setItems(songModel.getSongs());
     }
@@ -561,20 +554,20 @@ public class MainViewController implements Initializable {
     }
 
     @FXML
-    private void handleClearSearch(MouseEvent event)
+    private void handleClearSearch()
     {
         txtSearch.setText("");
 
     }
 
     @FXML
-    private void handleSetTimeElapsed(MouseEvent event)
+    private void handleSetTimeElapsed()
     {
 
     }
 
     @FXML
-    private void handleBrowseOnAction(ActionEvent event)
+    private void handleBrowseOnAction()
     {
         tableSongs.requestFocus();
         tableSongs.setItems(songModel.getSongs());
@@ -583,7 +576,7 @@ public class MainViewController implements Initializable {
     }
 
     @FXML
-    private void DeletePlaylist(ActionEvent event)
+    private void DeletePlaylist()
     {
 
         deletePlaylist();
@@ -644,10 +637,17 @@ public class MainViewController implements Initializable {
     @FXML
     public void macros(KeyEvent key)
     {
+        
+        if(key.getCode() == KeyCode.SPACE)
+        {
+            handlePlay();
+        }
+        
         if (key.getCode() == KeyCode.DELETE)
         {
             if (key.getSource() == tablePlaylists)
             {
+
                 deletePlaylist();
             }
 
@@ -655,15 +655,15 @@ public class MainViewController implements Initializable {
             {
                 deleteSong();
             }
-
-        }
+      }
 
         if (key.isControlDown())
         {
             if (key.getSource() == mainPane)
             {
-                if (KeyCode.A == key.getCode())
+                if (KeyCode.N == key.getCode())
                 {
+
                     addSong();
                 }
 
@@ -674,6 +674,7 @@ public class MainViewController implements Initializable {
             }
         }
     }
+            
 
     private void nextSongInList()
     {
