@@ -9,7 +9,7 @@ import java.util.UUID;
  */
 public class Song implements Serializable {
 
-    private final String id;
+    private final UUID id;
     private String title;
     private String artist;
     private String genre;
@@ -30,7 +30,7 @@ public class Song implements Serializable {
      */
     public Song(String title, String artist, String genre, String duration, int rating, String path)
     {
-        this.id = UUID.randomUUID().toString();
+        this.id = UUID.randomUUID();
         this.title = title;
         this.artist = artist;
         this.genre = genre;
@@ -44,7 +44,7 @@ public class Song implements Serializable {
      *
      * @return Returns an integer value representing the id of this song.
      */
-    public String getId()
+    public UUID getId()
     {
         return id;
     }

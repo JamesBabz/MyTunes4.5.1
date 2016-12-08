@@ -8,6 +8,7 @@ package mytunes.be;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.Serializable;
+import java.util.UUID;
 
 /**
  *
@@ -16,10 +17,10 @@ import java.io.Serializable;
 public class Playlist implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private int id;
+    private final UUID id;
     private String title;
     private double totalDuration;
-    private List<Song> songList;
+    private ArrayList<Song> songList;
     private int numSongs;
 
     /**
@@ -29,6 +30,7 @@ public class Playlist implements Serializable {
      */
     public Playlist(String title)
     {
+        this.id = UUID.randomUUID();
         this.title = title;
         songList = new ArrayList<Song>();
     }
@@ -58,7 +60,7 @@ public class Playlist implements Serializable {
      *
      * @return Returns an integer value representing the playlist's id.
      */
-    public int getId()
+    public UUID getId()
     {
         return id;
     }
@@ -78,7 +80,7 @@ public class Playlist implements Serializable {
      *
      * @return Returns a list of songs representing the playlist.
      */
-    public List<Song> getSongList()
+    public ArrayList<Song> getSongList()
     {
         return songList;
     }
