@@ -73,7 +73,7 @@ public class PlaylistModel {
     public void loadPlaylistData() throws FileNotFoundException
     {
         playlists.clear();
-        playlists.addAll(playlistDAO.readObjectData("PlaylistTest.dat"));
+        playlists.addAll(playlistDAO.readObjectData("PlaylistData.dat"));
     }
 
     public void savePlaylistData()
@@ -86,7 +86,7 @@ public class PlaylistModel {
                 playlistToSave.add(playlist);
 
             }
-            playlistDAO.writeObjectData(playlistToSave, "PlaylistTest.dat");
+            playlistDAO.writeObjectData(playlistToSave, "PlaylistData.dat");
         }
         catch (IOException ex)
         {

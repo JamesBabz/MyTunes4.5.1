@@ -43,6 +43,7 @@ import mytunes.be.Playlist;
 import mytunes.be.Song;
 import mytunes.bll.PlaylistManager;
 import mytunes.bll.SongManager;
+import mytunes.dal.DataTableAssociation;
 import mytunes.gui.model.PlaylistModel;
 import mytunes.gui.model.SongModel;
 
@@ -55,6 +56,7 @@ public class MainViewController implements Initializable {
 
     private SongManager songManager;
     private PlaylistManager playlistManager;
+    private DataTableAssociation dataAssociation;
     private final ObservableList<Song> songsLibrary;
     private ObservableList<Song> currentSongsInView;
     private ObservableList<Playlist> playlists;
@@ -131,6 +133,11 @@ public class MainViewController implements Initializable {
      */
     public MainViewController()
     {
+        songManager = new SongManager();
+        playlistManager = new PlaylistManager();
+        songModel = SongModel.getInstance();
+        playlistModel = PlaylistModel.getInstance();
+        this.dataAssociation = DataTableAssociation.getInstance();
         this.songsLibrary = FXCollections.observableArrayList();
         this.currentSongsInView = FXCollections.observableArrayList();
         this.playlists = FXCollections.observableArrayList();
@@ -189,9 +196,10 @@ public class MainViewController implements Initializable {
     public void handleOnMousePressed(MouseEvent event)
     {
         selectedSong = tableSongs.selectionModelProperty().getValue().getSelectedItem();
-        if (event.isPrimaryButtonDown() && event.getClickCount() == 2)
+
+        if (selectedSong != null)
         {
-            if (selectedSong != null)
+            if (event.isPrimaryButtonDown() && event.getClickCount() == 2)
             {
                 songManager.pauseSong();
                 songManager.playSong(selectedSong, true);
@@ -199,6 +207,7 @@ public class MainViewController implements Initializable {
                 changePlayButton(false);
                 processMediaInfo();
             }
+
         }
     }
 
@@ -224,8 +233,34 @@ public class MainViewController implements Initializable {
         {
             songManager.pauseSong();
         }
+
         changePlayButton(isPlaying);
         processMediaInfo();
+        writeDataAssociation();
+    }
+
+    public void writeDataAssociation()
+    {
+        String dataString = "";
+        for (int pl = 0; pl < playlists.size(); pl++)
+        {
+            for (Song song : playlists.get(pl).getSongList())
+            {
+                String playlistID = playlists.get(pl).getId().toString();
+                String songID = String.valueOf(song.getId());
+                String dataCode = playlistID + "," + songID + System.lineSeparator();
+                if (!dataString.contains(dataCode))
+                {
+                    dataString += dataCode;
+                }
+            }
+        }
+        dataAssociation.writeTableData(dataString, 0, "Association.txt");
+    }
+
+    public void readDataAssociation()
+    {
+
     }
 
     /**
@@ -237,13 +272,6 @@ public class MainViewController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb)
     {
-
-        tester();
-
-        songManager = new SongManager();
-        playlistManager = new PlaylistManager();
-        songModel = SongModel.getInstance();
-        playlistModel = PlaylistModel.getInstance();
         colTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
         colArtist.setCellValueFactory(new PropertyValueFactory<>("artist"));
         colGenre.setCellValueFactory(new PropertyValueFactory<>("genre"));
@@ -258,6 +286,7 @@ public class MainViewController implements Initializable {
         isPlaying = false;
         processVolumeData();
         searchOnUpdate();
+
     }
 
     private void searchOnUpdate()
@@ -309,6 +338,7 @@ public class MainViewController implements Initializable {
      * Loads a new view on top of the main stage.
      *
      * @param viewName The view file to be loaded.
+     *
      * @throws IOException
      */
     private void loadStage(String viewName) throws IOException
@@ -385,17 +415,9 @@ public class MainViewController implements Initializable {
 
                         double timeElapsed = newVal.toMillis() / songManager.getSongLength().toMillis();
                         this.barMediaTimer.setProgress(timeElapsed);
-                        if (songManager.getCurrentlyPlayingSong().getDuration().isEmpty())
+                        if (newVal.toMillis() >= songManager.getSongLength().toMillis())
                         {
-                            if (barMediaTimer.getProgress() >= 0.999)
-                            {
-                                prevNextSong(true);
-                            }
-                        }else{
-                            if (barMediaTimer.getProgress() >= 1)
-                            {
-                                prevNextSong(true);
-                            }
+                            nextSongInList();
                         }
             });
 
@@ -419,45 +441,63 @@ public class MainViewController implements Initializable {
     @FXML
     public void handleNextSong()
     {
-        prevNextSong(true);
+        nextSongInList();
     }
 
     @FXML
     public void handlePreviousSong()
     {
-        prevNextSong(false);
+        TableViewSelectionModel<Song> selectionModel = tableSongs.selectionModelProperty().getValue();
+        int selectedSongIndex = selectionModel.getSelectedIndex();
+        int tableSongsTotalItems = tableSongs.getItems().size() - 1;
+
+        if (songManager.getSongTimeElapsed().toMillis() <= 3500.0)
+        {
+            if (selectedSongIndex == 0 || selectedSong == null)
+            {
+                selectionModel.clearAndSelect(tableSongsTotalItems);
+            }
+            else
+            {
+                selectionModel.clearAndSelect(selectedSongIndex - 1);
+            }
+        }
+        else
+        {
+            selectionModel.clearAndSelect(selectedSongIndex);
+        }
+
+        selectedSong = selectionModel.getSelectedItem();
+
+        songManager.pauseSong();
+        songManager.playSong(selectedSong, true);
+        songManager.getMediaPlayer().setVolume(sliderVolume.getValue() / 100);
+
+        changePlayButton(false);
+        processMediaInfo();
     }
 
     @FXML
     private void handleEditSong() throws IOException
     {
         handleContextSong();
-        Stage primStage = (Stage) tableSongs.getScene().getWindow();
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/mytunes/gui/view/EditSongView.fxml"));
-        Parent root = loader.load();
-
-        EditSongViewController editSongViewController = loader.getController();
-
-        Stage editSongViewStage = new Stage();
-        editSongViewStage.setScene(new Scene(root));
-
-        editSongViewStage.initModality(Modality.WINDOW_MODAL);
-        editSongViewStage.initOwner(primStage);
-
-        editSongViewStage.show();
-
+        loadStage("EditSongView");
     }
 
     @FXML
     private void handleDeleteSong()
     {
         deleteSong();
-
     }
 
     private void deleteSong()
     {
-        songModel.getSongs().remove(selectedSong);
+        if (tableSongs.getItems() == songsLibrary)
+        {
+            songsLibrary.remove(selectedSong);
+        }
+
+        selectedPlaylist.getSongList().remove(selectedSong);
         tableSongs.getItems().remove(selectedSong);
 
     }
@@ -480,6 +520,15 @@ public class MainViewController implements Initializable {
         selectedPlaylist = tablePlaylists.getSelectionModel().getSelectedItem();
         if (selectedPlaylist != null)
         {
+            if (!selectedPlaylist.getSongList().isEmpty())
+            {
+                ArrayList<String> fileList = dataAssociation.readTableData("Association.txt");
+                for (String string : fileList)
+                {
+                    System.out.println(string);
+                }
+            }
+
             currentSongsInView.clear();
 
             for (Song song : selectedPlaylist.getSongList())
@@ -493,9 +542,9 @@ public class MainViewController implements Initializable {
                     currentSongsInView.remove(song);
                 }
             }
+            hasBrowseButtonBeenClicked = false;
+            tableSongs.setItems(currentSongsInView);
         }
-        tableSongs.setItems(currentSongsInView);
-        hasBrowseButtonBeenClicked = false;
     }
 
     private void initialLoad()
@@ -509,7 +558,7 @@ public class MainViewController implements Initializable {
         {
             Logger.getLogger(MainViewController.class.getName()).log(Level.SEVERE, null, e);
         }
-        tableSongs.setItems(songModel.getSongs());
+
     }
 
     @FXML
@@ -566,6 +615,7 @@ public class MainViewController implements Initializable {
     private void deletePlaylist()
     {
         PlaylistModel.getInstance().getPlaylists().remove(selectedPlaylist);
+        playlists.remove(selectedPlaylist);
         tablePlaylists.getItems().remove(selectedPlaylist);
     }
 
@@ -596,11 +646,6 @@ public class MainViewController implements Initializable {
         menuAddToPL.getItems().setAll(playlistSubMenu);
     }
 
-    public void tester()
-    {
-        barMediaTimer.setDisable(false);
-    }
-
     //Seeks on mouse release on the progress bar
     @FXML
     private void dragDone(MouseEvent event)
@@ -610,7 +655,7 @@ public class MainViewController implements Initializable {
         double diff = 100 / width * mousePos;
         double length = songManager.getSongLength().toSeconds();
         double lenghtDiff = length / 100 * diff;
-        System.out.println(barMediaTimer.getProgress());
+
         songManager.getMediaPlayer().seek(Duration.seconds(lenghtDiff));
     }
 
@@ -643,7 +688,6 @@ public class MainViewController implements Initializable {
             {
                 if (KeyCode.N == key.getCode())
                 {
-
                     addSong();
                 }
 
@@ -655,38 +699,22 @@ public class MainViewController implements Initializable {
         }
     }
 
-    public void prevNextSong(boolean next)
+    private void nextSongInList()
     {
+
         TableViewSelectionModel<Song> selectionModel = tableSongs.selectionModelProperty().getValue();
         int selectedSongIndex = selectionModel.getSelectedIndex();
         int tableSongsTotalItems = tableSongs.getItems().size() - 1;
 
-        if (next)
+        if (selectedSongIndex == tableSongsTotalItems || selectedSong == null)
         {
-            if (selectedSongIndex == tableSongsTotalItems || selectedSong == null)
-            {
-                selectionModel.clearAndSelect(0);
-            }
-            else
-            {
-                selectionModel.clearAndSelect(selectedSongIndex + 1);
-            }
-        }
-        else if (songManager.getSongTimeElapsed().toMillis() <= 3500.0)
-        {
-            if (selectedSongIndex == 0 || selectedSong == null)
-            {
-                selectionModel.clearAndSelect(tableSongsTotalItems);
-            }
-            else
-            {
-                selectionModel.clearAndSelect(selectedSongIndex - 1);
-            }
+            selectionModel.clearAndSelect(0);
         }
         else
         {
-            selectionModel.clearAndSelect(selectedSongIndex);
+            selectionModel.clearAndSelect(selectedSongIndex + 1);
         }
+
         selectedSong = selectionModel.getSelectedItem();
 
         songManager.pauseSong();
@@ -695,6 +723,7 @@ public class MainViewController implements Initializable {
 
         changePlayButton(false);
         processMediaInfo();
+
     }
 
 }
