@@ -391,9 +391,14 @@ public class MainViewController implements Initializable {
 
                         double timeElapsed = newVal.toMillis() / songManager.getSongLength().toMillis();
                         this.barMediaTimer.setProgress(timeElapsed);
-                        if (newVal.toMillis() >= songManager.getSongLength().toMillis())
+                        if (songManager.getCurrentlyPlayingSong().getDuration().isEmpty() && barMediaTimer.getProgress() >= 0.999)
                         {
-                            nextSongInList();
+                            prevNextSong(true);
+
+                        }
+                        else if (!songManager.getCurrentlyPlayingSong().getDuration().isEmpty() && barMediaTimer.getProgress() == 1)
+                        {
+                            prevNextSong(true);
                         }
             });
 
@@ -417,40 +422,13 @@ public class MainViewController implements Initializable {
     @FXML
     public void handleNextSong()
     {
-        nextSongInList();
+        prevNextSong(true);
     }
 
     @FXML
     public void handlePreviousSong()
     {
-        TableViewSelectionModel<Song> selectionModel = tableSongs.selectionModelProperty().getValue();
-        int selectedSongIndex = selectionModel.getSelectedIndex();
-        int tableSongsTotalItems = tableSongs.getItems().size() - 1;
-
-        if (songManager.getSongTimeElapsed().toMillis() <= 3500.0)
-        {
-            if (selectedSongIndex == 0 || selectedSong == null)
-            {
-                selectionModel.clearAndSelect(tableSongsTotalItems);
-            }
-            else
-            {
-                selectionModel.clearAndSelect(selectedSongIndex - 1);
-            }
-        }
-        else
-        {
-            selectionModel.clearAndSelect(selectedSongIndex);
-        }
-
-        selectedSong = selectionModel.getSelectedItem();
-
-        songManager.pauseSong();
-        songManager.playSong(selectedSong, true);
-        songManager.getMediaPlayer().setVolume(sliderVolume.getValue() / 100);
-
-        changePlayButton(false);
-        processMediaInfo();
+        prevNextSong(false);
     }
 
     @FXML
@@ -483,7 +461,7 @@ public class MainViewController implements Initializable {
             }
             else
             {
-                
+
                 tableSongs.getItems().remove(selectedSong);
 
                 deleteFromLibrary();
@@ -543,7 +521,8 @@ public class MainViewController implements Initializable {
                         currentSongsInView.add(song);
                     }
                 }
-            }hasBrowseButtonBeenClicked = false;
+            }
+            hasBrowseButtonBeenClicked = false;
             tableSongs.setItems(currentSongsInView);
         }
     }
@@ -700,22 +679,38 @@ public class MainViewController implements Initializable {
         }
     }
 
-    private void nextSongInList()
+    private void prevNextSong(boolean next)
     {
-
         TableViewSelectionModel<Song> selectionModel = tableSongs.selectionModelProperty().getValue();
         int selectedSongIndex = selectionModel.getSelectedIndex();
         int tableSongsTotalItems = tableSongs.getItems().size() - 1;
 
-        if (selectedSongIndex == tableSongsTotalItems || selectedSong == null)
+        if (next)
         {
-            selectionModel.clearAndSelect(0);
+            if (selectedSongIndex == tableSongsTotalItems || selectedSong == null)
+            {
+                selectionModel.clearAndSelect(0);
+            }
+            else
+            {
+                selectionModel.clearAndSelect(selectedSongIndex + 1);
+            }
+        }
+        else if (songManager.getSongTimeElapsed().toMillis() <= 3500.0)
+        {
+            if (selectedSongIndex == 0 || selectedSong == null)
+            {
+                selectionModel.clearAndSelect(tableSongsTotalItems);
+            }
+            else
+            {
+                selectionModel.clearAndSelect(selectedSongIndex - 1);
+            }
         }
         else
         {
-            selectionModel.clearAndSelect(selectedSongIndex + 1);
+            selectionModel.clearAndSelect(selectedSongIndex);
         }
-
         selectedSong = selectionModel.getSelectedItem();
 
         songManager.pauseSong();
@@ -724,7 +719,6 @@ public class MainViewController implements Initializable {
 
         changePlayButton(false);
         processMediaInfo();
-
     }
 
 }
