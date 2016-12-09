@@ -135,6 +135,12 @@ public class MainViewController implements Initializable {
     private Hyperlink hlinkBrowse;
     @FXML
     private Label lblClearSearch;
+    @FXML
+    private Menu fileAddToPL;
+    @FXML
+    private ImageView imgShuffle;
+    @FXML
+    private ImageView imgRepeat;
 
     /**
      * The default contructor for this class.
@@ -221,8 +227,28 @@ public class MainViewController implements Initializable {
         catch (IOException ex)
         {
             Logger.getLogger(MainViewController.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("Simon sutter!");
+      
         }
+    }
+    
+      @FXML
+    private void handleRenamePL(ActionEvent event) {
+        RenamePlaylist();
+        
+    }
+    
+    private void RenamePlaylist(){
+        
+          try
+        {
+            handleContextPlaylist();
+            loadStage("RenamePlaylistView");
+        }
+        catch (IOException ex)
+        {
+            Logger.getLogger(MainViewController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }
 
     /**
@@ -607,8 +633,13 @@ public class MainViewController implements Initializable {
     }
 
     @FXML
-    private void updatePLMenu()
+    private void handleContextPLMenu()
     {
+        updatePlaylistMenu(menuAddToPL);
+        updatePlaylistMenu(fileAddToPL);
+    }
+
+    private boolean updatePlaylistMenu(Menu menu) {
         List<MenuItem> playlistSubMenu = new ArrayList<>();
         for (Playlist playlist : playlists)
         {
@@ -623,14 +654,14 @@ public class MainViewController implements Initializable {
             });
             playlistSubMenu.add(item);
         }
-        if (playlistSubMenu.isEmpty())
-        {
+        if (playlistSubMenu.isEmpty()) {
             MenuItem empty = new MenuItem("<Empty>");
             empty.setDisable(true);
-            menuAddToPL.getItems().set(0, empty);
-            return;
+            menu.getItems().set(0, empty);
+            return true;
         }
-        menuAddToPL.getItems().setAll(playlistSubMenu);
+        menu.getItems().setAll(playlistSubMenu);
+        return false;
     }
 
     //Seeks on mouse release on the progress bar
@@ -742,8 +773,21 @@ public class MainViewController implements Initializable {
 
         changePlayButton(false);
         processMediaInfo();
+        
+        
+    }
+    
+       @FXML
+    private void handleMoveSongUp() {
+        moveSong(true);
     }
 
+    @FXML
+    private void handleMoveSongDown() {
+        moveSong(false);
+    }
+
+    
     public void moveSong(boolean up)
     {
 
@@ -787,5 +831,13 @@ public class MainViewController implements Initializable {
     {
         isRepeatToggled = !isRepeatToggled;
     }
+
+    private void handleContextPlaylist() {
+        playlistModel.setContextPlaylist(selectedPlaylist);
+    }
+
+  
+
+ 
 
 }
