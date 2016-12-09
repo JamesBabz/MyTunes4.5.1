@@ -8,6 +8,8 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -45,51 +47,43 @@ import javafx.util.Duration;
 import mytunes.be.Playlist;
 import mytunes.be.Song;
 import mytunes.bll.PlaylistManager;
+import mytunes.bll.SearchQuery;
 import mytunes.bll.SongManager;
 import mytunes.gui.model.PlaylistModel;
 import mytunes.gui.model.SongModel;
 
 /**
- * See ya later
+ * This class is the main controller class, it handles all the interactions
+ * occuring in the main view.
  *
  * @author Stephan Fuhlendorff, Jacob Enemark, Thomas Hansen, Simon Birkedal
  */
-public class MainViewController implements Initializable {
+public class MainViewController implements Initializable
+{
 
-    private SongManager songManager;
-    private PlaylistManager playlistManager;
+    private final SongManager songManager;
+    private final PlaylistManager playlistManager;
+    private final SearchQuery searchQuery;
+    private final SongModel songModel;
+    private final PlaylistModel playlistModel;
     private final ObservableList<Song> songsLibrary;
+    private Stage primaryStage;
     private ObservableList<Song> currentSongsInView;
+    private final ObservableList<Song> searchedSongs;
     private ObservableList<Playlist> playlists;
-    private SongModel songModel;
     private Song selectedSong;
+    private Playlist selectedPlaylist;
     private boolean isPlaying;
     private boolean isMuted;
-    private double sliderVolumeValue;
-    private PlaylistModel playlistModel;
-    private Playlist selectedPlaylist;
     private boolean hasBrowseButtonBeenClicked;
-
-    private Stage primaryStage;
-    private Stage addSongStage;
-    private Stage addPlaylistStage;
+    private double sliderVolumeValue;
 
     @FXML
     private AnchorPane mainPane;
     @FXML
-    private Button btnPlay;
-    @FXML
-    private Button btnPrev;
-    @FXML
-    private Button btnNext;
-    @FXML
     private ImageView imgMute;
     @FXML
     private ImageView imgPlay;
-    @FXML
-    private ImageView imgPrev;
-    @FXML
-    private ImageView imgNext;
     @FXML
     private TextField txtSearch;
     @FXML
@@ -100,10 +94,6 @@ public class MainViewController implements Initializable {
     private Label lblTimeElapsed;
     @FXML
     private Slider sliderVolume;
-    @FXML
-    private MenuBar menuBar;
-    @FXML
-    private ContextMenu contextSong;
     @FXML
     private ProgressBar barMediaTimer;
     @FXML
@@ -123,10 +113,6 @@ public class MainViewController implements Initializable {
     @FXML
     private TableColumn<Playlist, String> colPlaylist;
     @FXML
-    private Hyperlink hlinkBrowse;
-    @FXML
-    private Label lblClearSearch;
-    @FXML
     private Menu menuAddToPL;
 
     /**
@@ -134,16 +120,42 @@ public class MainViewController implements Initializable {
      */
     public MainViewController()
     {
+        this.searchQuery = new SearchQuery();
+        this.searchedSongs = FXCollections.observableArrayList();
         this.hasBrowseButtonBeenClicked = true;
-        songManager = new SongManager();
-        playlistManager = new PlaylistManager();
-        songModel = SongModel.getInstance();
-        playlistModel = PlaylistModel.getInstance();
+        this.songManager = new SongManager();
+        this.playlistManager = new PlaylistManager();
+        this.songModel = SongModel.getInstance();
+        this.playlistModel = PlaylistModel.getInstance();
         this.songsLibrary = FXCollections.observableArrayList();
         this.currentSongsInView = FXCollections.observableArrayList();
         this.playlists = FXCollections.observableArrayList();
     }
-
+    
+    /**
+     * Loads the default settings.
+     * @param url
+     * @param rb
+     */
+    @Override
+    public void initialize(URL url, ResourceBundle rb)
+    {
+        colTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
+        colArtist.setCellValueFactory(new PropertyValueFactory<>("artist"));
+        colGenre.setCellValueFactory(new PropertyValueFactory<>("genre"));
+        colDuration.setCellValueFactory(new PropertyValueFactory<>("duration"));
+        colRating.setCellValueFactory(new PropertyValueFactory<>("rating"));
+        colPlaylist.setCellValueFactory(new PropertyValueFactory<>("title"));
+        tableSongs.setItems(songModel.getSongs());
+        currentSongsInView = songsLibrary;
+        setPlaylists();
+        tablePlaylists.setItems(playlists);
+        initialLoad();
+        isPlaying = false;
+        processVolumeData();
+        searchOnUpdate();        
+    }
+    
     /**
      * Loads the addSongView.
      */
@@ -189,7 +201,7 @@ public class MainViewController implements Initializable {
     }
 
     /**
-     * Handles the selected element whenever a mouse event occours.
+     * Handles the selected element whenever a mouse event occurs.
      *
      * @param event The mouse event to listen for.
      */
@@ -239,63 +251,26 @@ public class MainViewController implements Initializable {
         processMediaInfo();
     }
 
-    /**
-     * Initializes the default settings.
-     *
-     * @param url
-     * @param rb
-     */
-    @Override
-    public void initialize(URL url, ResourceBundle rb)
-    {
-        colTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
-        colArtist.setCellValueFactory(new PropertyValueFactory<>("artist"));
-        colGenre.setCellValueFactory(new PropertyValueFactory<>("genre"));
-        colDuration.setCellValueFactory(new PropertyValueFactory<>("duration"));
-        colRating.setCellValueFactory(new PropertyValueFactory<>("rating"));
-        colPlaylist.setCellValueFactory(new PropertyValueFactory<>("title"));
-        tableSongs.setItems(songModel.getSongs());
-        currentSongsInView = songsLibrary;
-        setPlaylists();
-        tablePlaylists.setItems(playlists);
-        initialLoad();
-        isPlaying = false;
-        processVolumeData();
-        searchOnUpdate();
-
-    }
-
     private void searchOnUpdate()
     {
-        txtSearch.textProperty().addListener((listener, oldVal, newVal)
-                -> 
-                {
-                    ObservableList<Song> searchedSongs = FXCollections.observableArrayList();
-                    searchedSongs.clear();
-                    ObservableList<Song> allSongsInCurrentView = currentSongsInView;
-                    if (selectedPlaylist == null || hasBrowseButtonBeenClicked)
-                    {
-                        allSongsInCurrentView.setAll(songModel.getSongs());
-                    }
-                    else
-                    {
-                        allSongsInCurrentView.setAll(selectedPlaylist.getSongList());
-                    }
-
-                    for (Song song : allSongsInCurrentView)
-                    {
-                        if (song.getTitle().trim().toLowerCase().contains(newVal.trim().toLowerCase())
-                                || song.getArtist().trim().toLowerCase().contains(newVal.trim().toLowerCase())
-                                || song.getGenre().trim().toLowerCase().contains(newVal.trim().toLowerCase())
-                                || String.valueOf(song.getRating()).trim().toLowerCase().contains(newVal.trim().toLowerCase())
-                                && !searchedSongs.contains(song))
-                        {
-                            searchedSongs.add(song);
-                        }
-                    }
-
-                    tableSongs.setItems(searchedSongs);
+        txtSearch.textProperty().addListener(new ChangeListener<String>() 
+        {
+            @Override
+            public void changed(ObservableValue<? extends String> listener, String oldQuery, String newQuery)
+            {
+                searchedSongs.setAll(searchQuery.search(getCurrentSongs(), newQuery));
+                tableSongs.setItems(searchedSongs);
+            }
         });
+    }
+    
+    private ObservableList<Song> getCurrentSongs()
+    {
+        if (selectedPlaylist == null || hasBrowseButtonBeenClicked)
+            currentSongsInView.setAll(songModel.getSongs());
+        else
+            currentSongsInView.setAll(selectedPlaylist.getSongList());
+        return currentSongsInView;
     }
 
     private void processVolumeData()
@@ -391,8 +366,8 @@ public class MainViewController implements Initializable {
 
                         double timeElapsed = newVal.toMillis() / songManager.getSongLength().toMillis();
                         this.barMediaTimer.setProgress(timeElapsed);
-                        if (songManager.getCurrentlyPlayingSong().getDuration().isEmpty() && barMediaTimer.getProgress() >= 0.999 ||
-                                !songManager.getCurrentlyPlayingSong().getDuration().isEmpty() && barMediaTimer.getProgress() == 1)
+                        if (songManager.getCurrentlyPlayingSong().getDuration().isEmpty() && barMediaTimer.getProgress() >= 0.999
+                                || !songManager.getCurrentlyPlayingSong().getDuration().isEmpty() && barMediaTimer.getProgress() == 1)
                         {
                             prevNextSong(true);
 
@@ -582,7 +557,7 @@ public class MainViewController implements Initializable {
     }
 
     @FXML
-    private void DeletePlaylist()
+    private void handleDeletePlaylist()
     {
 
         deletePlaylist();
@@ -603,7 +578,8 @@ public class MainViewController implements Initializable {
         for (Playlist playlist : playlists)
         {
             MenuItem item = new MenuItem(playlist.getTitle());
-            item.setOnAction(new EventHandler<ActionEvent>() {
+            item.setOnAction(new EventHandler<ActionEvent>()
+            {
 
                 @Override
                 public void handle(ActionEvent event)
@@ -643,6 +619,17 @@ public class MainViewController implements Initializable {
         if (key.getCode() == KeyCode.SPACE)
         {
             handlePlay();
+        }
+        if (selectedSong != null)
+        {
+            if (key.getCode() == KeyCode.UP)
+            {
+                moveSong(true);
+            }
+            if (key.getCode() == KeyCode.DOWN)
+            {
+                moveSong(false);
+            }
         }
 
         if (key.getCode() == KeyCode.DELETE)
@@ -716,6 +703,35 @@ public class MainViewController implements Initializable {
 
         changePlayButton(false);
         processMediaInfo();
+    }
+
+    public void moveSong(boolean up)
+    {
+
+        System.out.println(tableSongs.getSelectionModel().getSelectedIndex());
+        int currIndex = tableSongs.getSelectionModel().getSelectedIndex();
+        int changeIndex = currIndex;
+        boolean change = false;
+        if (up && currIndex != 0)
+        {
+            changeIndex = currIndex - 1;
+            change = true;
+        }
+        else if (!up && currIndex != tableSongs.getItems().size() - 1)
+        {
+            changeIndex = currIndex + 1;
+            change = true;
+        }
+
+        if (change)
+        {
+            Song changeSong = tableSongs.getItems().get(changeIndex);
+            tableSongs.getItems().set(changeIndex, selectedSong);
+            tableSongs.getItems().set(currIndex, changeSong);
+            selectedSong = tableSongs.getItems().get(changeIndex);
+            selectedPlaylist.getSongList().set(changeIndex, selectedSong);
+            selectedPlaylist.getSongList().set(currIndex, changeSong);
+        }
     }
 
 }
