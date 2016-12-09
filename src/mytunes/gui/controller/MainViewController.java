@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -58,8 +59,7 @@ import mytunes.gui.model.SongModel;
  *
  * @author Stephan Fuhlendorff, Jacob Enemark, Thomas Hansen, Simon Birkedal
  */
-public class MainViewController implements Initializable
-{
+public class MainViewController implements Initializable {
 
     private final SongManager songManager;
     private final PlaylistManager playlistManager;
@@ -77,6 +77,9 @@ public class MainViewController implements Initializable
     private boolean isMuted;
     private boolean hasBrowseButtonBeenClicked;
     private double sliderVolumeValue;
+    private boolean isShuffleToggled;
+    private boolean isRepeatToggled;
+    private Random rand;
 
     @FXML
     private AnchorPane mainPane;
@@ -114,12 +117,33 @@ public class MainViewController implements Initializable
     private TableColumn<Playlist, String> colPlaylist;
     @FXML
     private Menu menuAddToPL;
+    @FXML
+    private ContextMenu contextSong;
+    @FXML
+    private MenuBar menuBar;
+    @FXML
+    private Button btnPrev;
+    @FXML
+    private ImageView imgPrev;
+    @FXML
+    private Button btnPlay;
+    @FXML
+    private Button btnNext;
+    @FXML
+    private ImageView imgNext;
+    @FXML
+    private Hyperlink hlinkBrowse;
+    @FXML
+    private Label lblClearSearch;
 
     /**
      * The default contructor for this class.
      */
     public MainViewController()
     {
+        this.rand = new Random();
+        this.isShuffleToggled = false;
+        this.isRepeatToggled = false;
         this.searchQuery = new SearchQuery();
         this.searchedSongs = FXCollections.observableArrayList();
         this.hasBrowseButtonBeenClicked = true;
@@ -131,9 +155,10 @@ public class MainViewController implements Initializable
         this.currentSongsInView = FXCollections.observableArrayList();
         this.playlists = FXCollections.observableArrayList();
     }
-    
+
     /**
      * Loads the default settings.
+     *
      * @param url
      * @param rb
      */
@@ -153,9 +178,9 @@ public class MainViewController implements Initializable
         initialLoad();
         isPlaying = false;
         processVolumeData();
-        searchOnUpdate();        
+        searchOnUpdate();
     }
-    
+
     /**
      * Loads the addSongView.
      */
@@ -253,8 +278,7 @@ public class MainViewController implements Initializable
 
     private void searchOnUpdate()
     {
-        txtSearch.textProperty().addListener(new ChangeListener<String>() 
-        {
+        txtSearch.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> listener, String oldQuery, String newQuery)
             {
@@ -263,13 +287,17 @@ public class MainViewController implements Initializable
             }
         });
     }
-    
+
     private ObservableList<Song> getCurrentSongs()
     {
         if (selectedPlaylist == null || hasBrowseButtonBeenClicked)
+        {
             currentSongsInView.setAll(songModel.getSongs());
+        }
         else
+        {
             currentSongsInView.setAll(selectedPlaylist.getSongList());
+        }
         return currentSongsInView;
     }
 
@@ -367,9 +395,16 @@ public class MainViewController implements Initializable
                         double timeElapsed = newVal.toMillis() / songManager.getSongLength().toMillis();
                         this.barMediaTimer.setProgress(timeElapsed);
                         if (songManager.getCurrentlyPlayingSong().getDuration().isEmpty() && barMediaTimer.getProgress() >= 0.999
-                                || !songManager.getCurrentlyPlayingSong().getDuration().isEmpty() && barMediaTimer.getProgress() == 1)
+                                || !songManager.getCurrentlyPlayingSong().getDuration().isEmpty() && barMediaTimer.getProgress() >= 1)
                         {
-                            prevNextSong(true);
+                            if (isRepeatToggled)
+                            {
+                                prevNextSong(false);
+                            }
+                            else
+                            {
+                                prevNextSong(true);
+                            }
 
                         }
             });
@@ -578,8 +613,7 @@ public class MainViewController implements Initializable
         for (Playlist playlist : playlists)
         {
             MenuItem item = new MenuItem(playlist.getTitle());
-            item.setOnAction(new EventHandler<ActionEvent>()
-            {
+            item.setOnAction(new EventHandler<ActionEvent>() {
 
                 @Override
                 public void handle(ActionEvent event)
@@ -620,17 +654,6 @@ public class MainViewController implements Initializable
         {
             handlePlay();
         }
-        if (selectedSong != null)
-        {
-            if (key.getCode() == KeyCode.UP)
-            {
-                moveSong(true);
-            }
-            if (key.getCode() == KeyCode.DOWN)
-            {
-                moveSong(false);
-            }
-        }
 
         if (key.getCode() == KeyCode.DELETE)
         {
@@ -648,6 +671,18 @@ public class MainViewController implements Initializable
 
         if (key.isControlDown())
         {
+            if (selectedSong != null)
+            {
+                if (key.getCode() == KeyCode.UP)
+                {
+                    moveSong(true);
+                }
+                if (key.getCode() == KeyCode.DOWN)
+                {
+                    moveSong(false);
+                }
+            }
+
             if (key.getSource() == mainPane)
             {
                 if (KeyCode.N == key.getCode())
@@ -671,7 +706,11 @@ public class MainViewController implements Initializable
 
         if (next)
         {
-            if (selectedSongIndex == tableSongsTotalItems || selectedSong == null)
+            if (isShuffleToggled)
+            {
+                selectionModel.clearAndSelect(rand.nextInt(tableSongs.getItems().size()));
+            }
+            else if (selectedSongIndex == tableSongsTotalItems || selectedSong == null)
             {
                 selectionModel.clearAndSelect(0);
             }
@@ -729,9 +768,24 @@ public class MainViewController implements Initializable
             tableSongs.getItems().set(changeIndex, selectedSong);
             tableSongs.getItems().set(currIndex, changeSong);
             selectedSong = tableSongs.getItems().get(changeIndex);
-            selectedPlaylist.getSongList().set(changeIndex, selectedSong);
-            selectedPlaylist.getSongList().set(currIndex, changeSong);
+            if (!hasBrowseButtonBeenClicked)
+            {
+                selectedPlaylist.getSongList().set(changeIndex, selectedSong);
+                selectedPlaylist.getSongList().set(currIndex, changeSong);
+            }
         }
+    }
+
+    @FXML
+    private void handleShuffle(ActionEvent event)
+    {
+        isShuffleToggled = !isShuffleToggled;
+    }
+
+    @FXML
+    private void handleRepeat(ActionEvent event)
+    {
+        isRepeatToggled = !isRepeatToggled;
     }
 
 }
