@@ -18,7 +18,8 @@ import mytunes.dal.PlaylistDAO;
  * @author James
  */
 public class PlaylistModel {
-
+    
+    private Playlist contextPlaylist;
     private PlaylistDAO playlistDAO;
     private static PlaylistModel instance;
 
@@ -58,6 +59,21 @@ public class PlaylistModel {
         }
 
     }
+    
+    public void renamePlaylist(Playlist contextPlaylist){
+            for (int i = 0; i < playlists.size(); i++)
+        {
+
+            Playlist playlist = playlists.get(i);
+            if (playlist.getId() == contextPlaylist.getId())
+            {
+
+                playlist.setTitle(contextPlaylist.getTitle());
+                //Replace the playlist
+                playlists.set(i, playlist);
+            }
+        }
+    }
 
     public ObservableList<String> getPlaylistTitles()
     {
@@ -92,6 +108,15 @@ public class PlaylistModel {
         {
             // TODO: exception handling.
         }
+    }
+
+    public Playlist getContextPlaylist() {
+        return contextPlaylist;
+    }
+    
+     public void setContextPlaylist(Playlist contextPlaylist)
+    {
+        this.contextPlaylist = contextPlaylist;
     }
 
 }
