@@ -76,7 +76,7 @@
             <ContextMenu>
               <items>
                 <MenuItem mnemonicParsing="false" onAction="#handleAddPlaylistButton" text="Add playlist" />
-                  <MenuItem mnemonicParsing="false" onAction="#DeletePlaylist" text="Delete playlist" />
+                  <MenuItem mnemonicParsing="false" onAction="#handleDeletePlaylist" text="Delete playlist" />
               </items>
             </ContextMenu>
          </contextMenu>
