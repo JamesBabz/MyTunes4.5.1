@@ -75,15 +75,11 @@ public class ReadSongProperty {
      * @return Returns a string value representing the song's duration in
      * minutes and seconds.
      */
-    public String getDuration()
+    public double getDuration()
     {
-        int trackLength = soundFile.getAudioHeader().getTrackLength();
+        double trackLength = soundFile.getAudioHeader().getTrackLength();
 
-        int minutes = trackLength / 60;
-        int seconds = trackLength % 60;
-        String formattedDuration = String.format("%02d:%02d", minutes, seconds);
-
-        return formattedDuration;
+        return trackLength;
     }
 
 }

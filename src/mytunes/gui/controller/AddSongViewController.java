@@ -13,7 +13,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -23,6 +22,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import mytunes.be.Song;
+import mytunes.bll.TimeFormat;
 import mytunes.dal.ReadSongProperty;
 import mytunes.gui.model.SongModel;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
@@ -35,7 +35,8 @@ import org.jaudiotagger.tag.TagException;
  *
  * @author James
  */
-public class AddSongViewController implements Initializable {
+public class AddSongViewController implements Initializable
+{
 
     private ReadSongProperty rsp;
 
@@ -98,7 +99,7 @@ public class AddSongViewController implements Initializable {
         String title = txtTitle.getText();
         String artist = txtArtist.getText();
         String genre = txtGenre.getText();
-        String duration = txtDuration.getText();
+        String duration = TimeFormat.formatDouble(rsp.getDuration());
         String path = txtPath.getText();
 
         song = new Song(title, artist, genre, duration, 0, path);
@@ -129,7 +130,7 @@ public class AddSongViewController implements Initializable {
             txtTitle.setText(rsp.getTitle());
             txtArtist.setText(rsp.getArtist());
             txtGenre.setText(rsp.getGenre());
-            txtDuration.setText(rsp.getDuration());
+            txtDuration.setText(TimeFormat.formatDouble(rsp.getDuration()));
         }
         catch (CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e)
         {
