@@ -24,10 +24,12 @@ import mytunes.gui.model.SongModel;
  */
 
 
-public class RenamePlaylistViewController implements Initializable {
+public class RenamePlaylistViewController implements Initializable 
+{
 
-    PlaylistModel playlistModel;
-    Playlist contextPlaylist;
+    private PlaylistModel playlistModel;
+    private Playlist contextPlaylist;
+    
     @FXML
     private TextField txtTitle;
     @FXML

@@ -4,12 +4,13 @@ import java.io.Serializable;
 import java.util.UUID;
 
 /**
- *
+ * The song business entity is a class which contains all information regarding
+ * a song. Including its title, duration, artist, etc.
  * @author Simon Birkedal
  */
 public class Song implements Serializable {
 
-    private final UUID id;
+    private final String id;
     private String title;
     private String artist;
     private String genre;
@@ -30,7 +31,7 @@ public class Song implements Serializable {
      */
     public Song(String title, String artist, String genre, String duration, int rating, String path)
     {
-        this.id = UUID.randomUUID();
+        this.id = UUID.randomUUID().toString();
         this.title = title;
         this.artist = artist;
         this.genre = genre;
@@ -44,7 +45,7 @@ public class Song implements Serializable {
      *
      * @return Returns an integer value representing the id of this song.
      */
-    public UUID getId()
+    public String getId()
     {
         return id;
     }
@@ -79,7 +80,6 @@ public class Song implements Serializable {
         return genre;
     }
 
-    // Needs rework, probably going to use a TimeSpan object.
     /**
      * Gets the duration of the song.
      *
@@ -90,7 +90,6 @@ public class Song implements Serializable {
         return duration;
     }
 
-    // Needs rework, probably make use of the Path object.
     /**
      * Gets the string representing the songs path.
      *
@@ -101,26 +100,45 @@ public class Song implements Serializable {
         return path;
     }
 
+    /**
+     * @return Returns the song's given rating.
+     */
     public int getRating()
     {
         return rating;
     }
 
+    /**
+     * Set a new song title.
+     * @param title The title to be set, e.g. Sleeping My Day Away.
+     */
     public void setTitle(String title)
     {
         this.title = title;
     }
 
+    /**
+     * Set a new artist.
+     * @param artist The artist to be set, e.g. D.A.D.
+     */
     public void setArtist(String artist)
     {
         this.artist = artist;
     }
 
+    /**
+     * Set a new genre.
+     * @param genre The genre to set, e.g. Rock.
+     */
     public void setGenre(String genre)
     {
         this.genre = genre;
     }
 
+    /**
+     * Set song rating.
+     * @param rating The new rating.
+     */
     public void setRating(int rating)
     {
         this.rating = rating;

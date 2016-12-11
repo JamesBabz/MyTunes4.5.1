@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mytunes.gui.controller;
 
 import java.io.File;
@@ -13,7 +8,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -23,6 +17,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import mytunes.be.Song;
+import mytunes.bll.TimeFormat;
 import mytunes.dal.ReadSongProperty;
 import mytunes.gui.model.SongModel;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
@@ -35,9 +30,12 @@ import org.jaudiotagger.tag.TagException;
  *
  * @author James
  */
-public class AddSongViewController implements Initializable {
-
+public class AddSongViewController implements Initializable
+{
     private ReadSongProperty rsp;
+    private SongModel songModel;
+    private Song song;
+    ObservableList<Song> songs = FXCollections.observableArrayList();
 
     @FXML
     private TextField txtTitle;
@@ -51,11 +49,6 @@ public class AddSongViewController implements Initializable {
     private TextField txtPath;
     @FXML
     private Button closeButton;
-
-    private SongModel songModel;
-
-    private Song song;
-    ObservableList<Song> songs = FXCollections.observableArrayList();
     @FXML
     private AnchorPane root;
 
@@ -98,9 +91,8 @@ public class AddSongViewController implements Initializable {
         String title = txtTitle.getText();
         String artist = txtArtist.getText();
         String genre = txtGenre.getText();
-        String duration = txtDuration.getText();
+        String duration = TimeFormat.formatDouble(rsp.getDuration());
         String path = txtPath.getText();
-
         song = new Song(title, artist, genre, duration, 0, path);
         songModel.addSong(song);
         closeWindow();
@@ -120,16 +112,20 @@ public class AddSongViewController implements Initializable {
 
     }
 
+    /**
+     * When a song is loaded, information about its title, genre, artist, etc
+     * is automatically placed in the txtFields.
+     * @param file The file to read the data from.
+     */
     private void prepopulateFields(File file)
     {
-
         try
         {
             rsp = new ReadSongProperty(file.getPath());
             txtTitle.setText(rsp.getTitle());
             txtArtist.setText(rsp.getArtist());
             txtGenre.setText(rsp.getGenre());
-            txtDuration.setText(rsp.getDuration());
+            txtDuration.setText(TimeFormat.formatDouble(rsp.getDuration()));
         }
         catch (CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e)
         {
