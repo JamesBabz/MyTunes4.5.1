@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mytunes.dal;
 
 import java.io.BufferedInputStream;
@@ -18,21 +13,34 @@ import mytunes.be.Playlist;
 
 /**
  * Class which reads and writes playlists from and to a file.
- *
- * @author Simon Birkedal
+ * @author Stephan Fuhlendorff, Jacob Enemark, Thomas Hansen, Simon Birkedal
  */
-public class PlaylistDAO {
+public class PlaylistDAO 
+{
 
-    public void writeObjectData(ArrayList<Playlist> associationHashMap, String fileName) throws IOException
+    /**
+     * Writes an object to a file, in this case the object must be an arraylist
+     * of Playlists.
+     * @param playlists The playlists to be saved.
+     * @param fileName The name of the file to save the playlist in.
+     * @throws IOException 
+     */
+    public void writeObjectData(ArrayList<Playlist> playlists, String fileName) throws IOException
     {
         FileOutputStream fos = new FileOutputStream(fileName);
         BufferedOutputStream bos = new BufferedOutputStream(fos);
         try (ObjectOutputStream oos = new ObjectOutputStream(fos))
         {
-            oos.writeObject(associationHashMap);
+            oos.writeObject(playlists);
         }
     }
 
+    /**
+     * Reads an object from a file, the object must be an arraylist of playlists.
+     * @param fileName The fileName to read the information from.
+     * @return Returns a new array containing all the stored data.
+     * @throws FileNotFoundException 
+     */
     public ArrayList<Playlist> readObjectData(String fileName) throws FileNotFoundException
     {
         ArrayList<Playlist> playlists = new ArrayList<>();

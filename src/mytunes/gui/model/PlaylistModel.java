@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mytunes.gui.model;
 
 import java.io.FileNotFoundException;
@@ -15,7 +10,7 @@ import mytunes.dal.PlaylistDAO;
 
 /**
  *
- * @author James
+ * @author Stephan Fuhlendorff, Jacob Enemark, Thomas Hansen, Simon Birkedal
  */
 public class PlaylistModel {
     
@@ -88,11 +83,11 @@ public class PlaylistModel {
 
     public void loadPlaylistData() throws FileNotFoundException
     {
-        playlists.clear();
-        playlists.addAll(playlistDAO.readObjectData("PlaylistData.dat"));
+            playlists.clear();
+            playlists.addAll(playlistDAO.readObjectData("PlaylistData.dat"));
     }
 
-    public void savePlaylistData()
+    public void savePlaylistData() throws Exception
     {
         try
         {
@@ -106,7 +101,7 @@ public class PlaylistModel {
         }
         catch (IOException ex)
         {
-            // TODO: exception handling.
+            throw new Exception("Can't save playlist");
         }
     }
 

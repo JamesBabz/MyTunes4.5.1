@@ -18,10 +18,14 @@ import mytunes.gui.model.SongModel;
 /**
  * FXML Controller class
  *
- * @author Thomas
+ * @author Stephan Fuhlendorff, Jacob Enemark, Thomas Hansen, Simon Birkedal
  */
-public class EditSongViewController implements Initializable {
+public class EditSongViewController implements Initializable 
+{
 
+    private SongModel songModel;
+    private Song contextSong;
+    
     @FXML
     private TextField txtTitle;
     @FXML
@@ -30,13 +34,8 @@ public class EditSongViewController implements Initializable {
     private TextField txtGenre;
     @FXML
     private TextField txtRating;
-
     @FXML
     private Button btnCancel;
-
-    SongModel songModel;
-
-    Song contextSong;
 
     /**
      * Initializes the controller class.
@@ -46,9 +45,6 @@ public class EditSongViewController implements Initializable {
     {
         songModel = SongModel.getInstance();
         getCurrentInfo();
-
-        
-
     }
 
     @FXML
@@ -78,6 +74,10 @@ public class EditSongViewController implements Initializable {
         stage.close();
     }
 
+    /**
+     * Gets the current information about the song and places it into the
+     * different txtFields in the view.
+     */
     private void getCurrentInfo()
     {
         contextSong = songModel.getContextSong();
