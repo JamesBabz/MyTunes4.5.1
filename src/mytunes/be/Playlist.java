@@ -14,7 +14,7 @@ import org.jaudiotagger.tag.TagException;
 /**
  * The playlist business entity contains all information regarding a playlist;
  * Title, Total Duration and what songs have been added to the playlist.
- * @author Simon Birkedal
+ * @author Stephan Fuhlendorff, Jacob Enemark, Thomas Hansen, Simon Birkedal
  */
 public class Playlist implements Serializable {
 

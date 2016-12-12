@@ -19,7 +19,7 @@ import java.util.ArrayList;
 /**
  * Class which reads and writes songs from and to a file.
  *
- * @author Simon Birkedal
+ * @author Stephan Fuhlendorff, Jacob Enemark, Thomas Hansen, Simon Birkedal
  */
 public class SongDAO 
 {

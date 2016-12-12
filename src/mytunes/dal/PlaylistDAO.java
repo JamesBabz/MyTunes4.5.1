@@ -13,7 +13,7 @@ import mytunes.be.Playlist;
 
 /**
  * Class which reads and writes playlists from and to a file.
- * @author Simon Birkedal
+ * @author Stephan Fuhlendorff, Jacob Enemark, Thomas Hansen, Simon Birkedal
  */
 public class PlaylistDAO 
 {

@@ -1,7 +1,7 @@
 package mytunes.bll;
 
 /**
- * @author Simon Birkedal
+ * @author Stephan Fuhlendorff, Jacob Enemark, Thomas Hansen, Simon Birkedal
  */
 public class TimeFormat
 {

@@ -18,7 +18,7 @@ import mytunes.gui.model.SongModel;
 /**
  * FXML Controller class
  *
- * @author Thomas
+ * @author Stephan Fuhlendorff, Jacob Enemark, Thomas Hansen, Simon Birkedal
  */
 public class EditSongViewController implements Initializable 
 {

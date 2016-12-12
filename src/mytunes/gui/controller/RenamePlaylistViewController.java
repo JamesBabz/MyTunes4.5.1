@@ -7,7 +7,6 @@ package mytunes.gui.controller;
 
 import java.net.URL;
 import java.util.ResourceBundle;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -15,12 +14,11 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import mytunes.be.Playlist;
 import mytunes.gui.model.PlaylistModel;
-import mytunes.gui.model.SongModel;
 
 /**
  * FXML Controller class
  *
- * @author Thomas
+ * @@author Stephan Fuhlendorff, Jacob Enemark, Thomas Hansen, Simon Birkedal
  */
 
 

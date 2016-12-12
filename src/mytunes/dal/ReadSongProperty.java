@@ -14,7 +14,7 @@ import org.jaudiotagger.tag.TagException;
  * Retrieves information about a song from a given path, such as; Title, Artist,
  * Genre and Song duration.
  *
- * @author Simon Birkedal
+ *@author Stephan Fuhlendorff, Jacob Enemark, Thomas Hansen, Simon Birkedal
  */
 public class ReadSongProperty 
 {
