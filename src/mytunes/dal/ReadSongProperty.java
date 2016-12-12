@@ -7,9 +7,8 @@ import org.jaudiotagger.audio.exceptions.CannotReadException;
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.audio.mp3.MP3File;
+import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.TagException;
-import org.jaudiotagger.tag.id3.ID3v24Frames;
-import org.jaudiotagger.tag.id3.ID3v24Tag;
 
 /**
  * Retrieves information about a song from a given path, such as; Title, Artist,
@@ -17,10 +16,9 @@ import org.jaudiotagger.tag.id3.ID3v24Tag;
  *
  * @author Simon Birkedal
  */
-public class ReadSongProperty {
-
-    private MP3File soundFile;
-    private ID3v24Tag soundTag;
+public class ReadSongProperty 
+{
+    private MP3File audioFile;
 
     /**
      * Default constructor.
@@ -34,8 +32,7 @@ public class ReadSongProperty {
      */
     public ReadSongProperty(String filePath) throws CannotReadException, IOException, TagException, ReadOnlyFileException, InvalidAudioFrameException
     {
-        this.soundFile = (MP3File) AudioFileIO.read(new File(filePath));
-        this.soundTag = soundFile.getID3v2TagAsv24();
+        this.audioFile = (MP3File) AudioFileIO.read(new File(filePath));
     }
 
     /**
@@ -45,7 +42,7 @@ public class ReadSongProperty {
      */
     public String getTitle()
     {
-        return soundTag.getFirst(ID3v24Frames.FRAME_ID_TITLE);
+        return audioFile.getID3v2Tag().getFirst(FieldKey.TITLE);
     }
 
     /**
@@ -55,7 +52,7 @@ public class ReadSongProperty {
      */
     public String getArtist()
     {
-        return soundTag.getFirst(ID3v24Frames.FRAME_ID_ARTIST);
+        return audioFile.getID3v2Tag().getFirst(FieldKey.ARTIST);
     }
 
     /**
@@ -65,7 +62,7 @@ public class ReadSongProperty {
      */
     public String getGenre()
     {
-        return soundTag.getFirst(ID3v24Frames.FRAME_ID_GENRE);
+        return audioFile.getID3v2Tag().getFirst(FieldKey.GENRE);
     }
 
     /**
@@ -75,15 +72,10 @@ public class ReadSongProperty {
      * @return Returns a string value representing the song's duration in
      * minutes and seconds.
      */
-    public String getDuration()
+    public double getDuration()
     {
-        int trackLength = soundFile.getAudioHeader().getTrackLength();
+        double trackLength = audioFile.getAudioHeader().getTrackLength();
 
-        int minutes = trackLength / 60;
-        int seconds = trackLength % 60;
-        String formattedDuration = String.format("%02d:%02d", minutes, seconds);
-
-        return formattedDuration;
+        return trackLength;
     }
-
 }

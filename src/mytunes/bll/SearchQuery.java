@@ -2,12 +2,10 @@ package mytunes.bll;
 
 import java.util.ArrayList;
 import java.util.List;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import mytunes.be.Song;
 
 /**
- * 
+ * A class that handles the search function.
  * @author Simon Birkedal
  */
 public class SearchQuery

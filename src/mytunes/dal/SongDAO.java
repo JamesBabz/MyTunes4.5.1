@@ -21,8 +21,17 @@ import java.util.ArrayList;
  *
  * @author Simon Birkedal
  */
-public class SongDAO {
+public class SongDAO 
+{
 
+    /**
+     * Writes an object to a file, in this case the object must be an arraylist
+     * of Songs.
+     *
+     * @param songs The songs to be saved.
+     * @param fileName  The name of the file to save the songs in.
+     * @throws IOException
+     */
     public void writeObjectData(ArrayList<Song> songs, String fileName) throws IOException
     {
         FileOutputStream fos = new FileOutputStream(fileName);
@@ -33,6 +42,14 @@ public class SongDAO {
         }
     }
 
+    /**
+     * Reads an object from a file, the object must be an arraylist of
+     * songs.
+     *
+     * @param fileName The fileName to read the information from.
+     * @return Returns a new array containing all the stored data.
+     * @throws FileNotFoundException
+     */
     public ArrayList<Song> readObjectData(String fileName) throws FileNotFoundException
     {
         ArrayList<Song> songList = new ArrayList<Song>();
