@@ -60,21 +60,20 @@ public class AddSongViewController implements Initializable
     {
         songModel = SongModel.getInstance();
 
-        txtPath.textProperty().addListener((observable, oldValue, newValue)
-                -> 
-                {
-                    if (newValue.isEmpty())
-                    {
-                        txtTitle.setDisable(true);
-                        txtArtist.setDisable(true);
-                        txtGenre.setDisable(true);
-                    }
-                    else
-                    {
-                        txtTitle.setDisable(false);
-                        txtArtist.setDisable(false);
-                        txtGenre.setDisable(false);
-                    }
+        txtPath.textProperty().addListener((observable, oldValue, newValue) -> 
+        {
+            if (newValue.isEmpty())
+            {
+                txtTitle.setDisable(true);
+                txtArtist.setDisable(true);
+                txtGenre.setDisable(true);
+            }
+            else
+            {
+                txtTitle.setDisable(false);
+                txtArtist.setDisable(false);
+                txtGenre.setDisable(false);
+            }
         });
     }
 
@@ -90,26 +89,30 @@ public class AddSongViewController implements Initializable
     {
         String title = txtTitle.getText();
         String artist = txtArtist.getText();
-        String genre = txtGenre.getText();
+        String genre = txtGenre.getText();        
         String duration = TimeFormat.formatDouble(rsp.getDuration());
         String path = txtPath.getText();
         song = new Song(title, artist, genre, duration, 0, path);
         songModel.addSong(song);
         closeWindow();
-
     }
 
     @FXML
     private void browseForFile()
     {
-
-        FileChooser fileChooser = new FileChooser();
-        Window win = root.getScene().getWindow();
-        File file = fileChooser.showOpenDialog(win);
-        txtPath.setText(file.getPath());
-
-        prepopulateFields(file);
-
+        try
+        {
+            FileChooser fileChooser = new FileChooser();
+            Window win = root.getScene().getWindow();
+            File file = fileChooser.showOpenDialog(win);
+            txtPath.setText(file.getPath());
+            
+            prepopulateFields(file);
+        }
+        catch (CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException ex)
+        {
+            Logger.getLogger(AddSongViewController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -117,20 +120,14 @@ public class AddSongViewController implements Initializable
      * is automatically placed in the txtFields.
      * @param file The file to read the data from.
      */
-    private void prepopulateFields(File file)
+    private void prepopulateFields(File file) throws CannotReadException, IOException, TagException, ReadOnlyFileException, InvalidAudioFrameException
     {
-        try
-        {
-            rsp = new ReadSongProperty(file.getPath());
-            txtTitle.setText(rsp.getTitle());
-            txtArtist.setText(rsp.getArtist());
-            txtGenre.setText(rsp.getGenre());
-            txtDuration.setText(TimeFormat.formatDouble(rsp.getDuration()));
-        }
-        catch (CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException e)
-        {
-            Logger.getLogger(AddSongViewController.class.getName()).log(Level.SEVERE, null, e);
-        }
+        rsp = new ReadSongProperty(file.getPath());
+        txtTitle.setText(rsp.getTitle());
+        txtArtist.setText(rsp.getArtist());
+        txtGenre.setText(rsp.getGenre());
+        txtDuration.setText(TimeFormat.formatDouble(rsp.getDuration()));
+
     }
 
 }

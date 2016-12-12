@@ -1,5 +1,6 @@
 package mytunes.gui.controller;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
@@ -8,8 +9,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -22,9 +21,13 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
@@ -35,9 +38,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -47,8 +53,14 @@ import mytunes.be.Song;
 import mytunes.bll.PlaylistManager;
 import mytunes.bll.SearchQuery;
 import mytunes.bll.SongManager;
+import mytunes.bll.TimeFormat;
+import mytunes.dal.ReadSongProperty;
 import mytunes.gui.model.PlaylistModel;
 import mytunes.gui.model.SongModel;
+import org.jaudiotagger.audio.exceptions.CannotReadException;
+import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
+import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
+import org.jaudiotagger.tag.TagException;
 
 /**
  * This class is the main controller class, it handles all the interactions
@@ -78,6 +90,8 @@ public class MainViewController implements Initializable
     private boolean isShuffleToggled;
     private boolean isRepeatToggled;
     private final Random rand;
+    private ReadSongProperty rsp;
+
 
     @FXML
     private AnchorPane mainPane;
@@ -420,6 +434,57 @@ public class MainViewController implements Initializable
     {
         isRepeatToggled = !isRepeatToggled;
     }
+    
+    
+    @FXML
+    private void handleDragOver(DragEvent event)
+    {
+        Dragboard db = event.getDragboard();
+        if (db.hasFiles())
+        {
+            event.acceptTransferModes(TransferMode.COPY);
+        }
+        else
+        {
+            event.consume();
+        }
+    }
+
+    @FXML
+    private void handleDragDropped(DragEvent event) throws CannotReadException, IOException, TagException, ReadOnlyFileException, InvalidAudioFrameException
+    {
+        Dragboard db = event.getDragboard();
+        boolean success = false;
+        if (db.hasFiles())
+        {
+            success = true;
+            for (File file : db.getFiles())
+            {
+                String filePath = file.getPath();
+                rsp = new ReadSongProperty(filePath);
+
+                String title = rsp.getTitle();
+                String artist = rsp.getArtist();
+                String genre = rsp.getGenre();
+                String duration = TimeFormat.formatDouble(rsp.getDuration());
+                Song song = new Song(title, artist, genre, duration, 0, filePath);
+                if (selectedPlaylist != null && !hasBrowseButtonBeenClicked)
+                {
+                    playlistManager.addSong(selectedPlaylist, song);
+                    songModel.getSongs().add(song);
+                    tableSongs.getItems().add(song);
+                }
+                else
+                {
+                    songModel.getSongs().add(song);
+                }
+            }
+            tablePlaylists.refresh();
+            tableSongs.refresh();
+        }
+        event.setDropCompleted(success);
+        event.consume();
+    }
 
     /**
      * Loads the add song view stage.
@@ -452,11 +517,10 @@ public class MainViewController implements Initializable
      */
     private void searchOnUpdate()
     {
-        txtSearch.textProperty().addListener((ObservableValue<? extends String> listener, String oldQuery, String newQuery)
-                -> 
-                {
-                    searchedSongs.setAll(searchQuery.search(getCurrentSongs(), newQuery));
-                    tableSongs.setItems(searchedSongs);
+        txtSearch.textProperty().addListener((ObservableValue<? extends String> listener, String oldQuery, String newQuery) -> 
+        {
+            searchedSongs.setAll(searchQuery.search(getCurrentSongs(), newQuery));
+            tableSongs.setItems(searchedSongs);
         });
     }
 
@@ -486,13 +550,15 @@ public class MainViewController implements Initializable
      */
     private void processVolumeData()
     {
-        sliderVolume.valueProperty().addListener((ObservableValue<? extends Number> listener, Number oldVal, Number newVal)
-                -> 
-                {
-                    songManager.adjustVolume(newVal.doubleValue() / 100);
-                    Image image = new Image(getClass().getResourceAsStream("/mytunes/images/unmute.png"));
-                    imgMute.setImage(image);
-                    isMuted = false;
+        sliderVolume.valueProperty().addListener((ObservableValue<? extends Number> listener, Number oldVal, Number newVal) -> 
+        {
+            if (songManager.getMediaPlayer() != null)
+            {
+                songManager.adjustVolume(newVal.doubleValue() / 100);
+                Image image = new Image(getClass().getResourceAsStream("/mytunes/images/unmute.png"));
+                imgMute.setImage(image);
+                isMuted = false;
+            }
         });
     }
 
@@ -558,27 +624,26 @@ public class MainViewController implements Initializable
      */
     private void processMediaUpdates()
     {
-        songManager.getMediaPlayer().currentTimeProperty().addListener((ObservableValue<? extends Duration> listener, Duration oldVal, Duration newVal)
-                -> 
+        songManager.getMediaPlayer().currentTimeProperty().addListener((ObservableValue<? extends Duration> listener, Duration oldVal, Duration newVal) -> 
+        {
+            long minutes = (long) newVal.toMinutes();
+            long seconds = (long) (newVal.toSeconds() % 60);
+            this.lblTimeElapsed.setText(String.format("%02d:%02d", minutes, seconds));
+
+            double timeElapsed = newVal.toMillis() / songManager.getSongLength().toMillis();
+            this.barMediaTimer.setProgress(timeElapsed);
+
+            if (songManager.getCurrentlyPlayingSong().getDuration().isEmpty() && barMediaTimer.getProgress() >= 0.999
+                    || !songManager.getCurrentlyPlayingSong().getDuration().isEmpty() && barMediaTimer.getProgress() >= 1)
+            {
+                if (isRepeatToggled)
                 {
-                    long minutes = (long) newVal.toMinutes();
-                    long seconds = (long) (newVal.toSeconds() % 60);
-                    this.lblTimeElapsed.setText(String.format("%02d:%02d", minutes, seconds));
-
-                    double timeElapsed = newVal.toMillis() / songManager.getSongLength().toMillis();
-                    this.barMediaTimer.setProgress(timeElapsed);
-
-                    if (songManager.getCurrentlyPlayingSong().getDuration().isEmpty() && barMediaTimer.getProgress() >= 0.999
-                            || !songManager.getCurrentlyPlayingSong().getDuration().isEmpty() && barMediaTimer.getProgress() >= 1)
-                    {
-                        if (isRepeatToggled)
-                        {
-                            prevNextSong(false);
-                        } else
-                        {
-                            prevNextSong(true);
-                        }
-                    }
+                    prevNextSong(false);
+                } else
+                {
+                    prevNextSong(true);
+                }
+            }
         });
 
         lblSongPlaying.setText(songManager.getCurrentlyPlayingSong().getTitle());
@@ -800,5 +865,5 @@ public class MainViewController implements Initializable
                 selectedPlaylist.getSongList().set(currIndex, changeSong);
             }
         }
-    }
+    }  
 }
