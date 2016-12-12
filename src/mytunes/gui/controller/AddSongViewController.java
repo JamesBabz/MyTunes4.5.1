@@ -60,6 +60,10 @@ public class AddSongViewController implements Initializable
     {
         songModel = SongModel.getInstance();
 
+        /**
+         * Allows the user to change Title, Artist, Genre, etc once a path
+         * has been set.
+         */
         txtPath.textProperty().addListener((observable, oldValue, newValue) -> 
         {
             if (newValue.isEmpty())

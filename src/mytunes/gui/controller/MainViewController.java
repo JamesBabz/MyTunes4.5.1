@@ -133,6 +133,34 @@ public class MainViewController implements Initializable
     private Menu menuAddToPL;
     @FXML
     private Menu fileAddToPL;
+    @FXML
+    private ContextMenu contextSong;
+    @FXML
+    private MenuItem itemAddSong;
+    @FXML
+    private MenuItem itemEdit;
+    @FXML
+    private MenuItem itemDelete;
+    @FXML
+    private MenuBar menuBar;
+    @FXML
+    private Button btnPrev;
+    @FXML
+    private ImageView imgPrev;
+    @FXML
+    private Button btnPlay;
+    @FXML
+    private Button btnNext;
+    @FXML
+    private ImageView imgNext;
+    @FXML
+    private Hyperlink hlinkBrowse;
+    @FXML
+    private Label lblClearSearch;
+    @FXML
+    private ImageView imgShuffle;
+    @FXML
+    private ImageView imgRepeat;
 
     /**
      * The default contructor for this class.
@@ -249,10 +277,10 @@ public class MainViewController implements Initializable
         {
             if (event.isPrimaryButtonDown() && event.getClickCount() == 2)
             {
-                songManager.pauseSong();
                 songManager.playSong(selectedSong, true);
 
                 changePlayButton(false);
+                songManager.adjustVolume(sliderVolume.getValue() / 100);
                 processMediaUpdates();
             }
         }
