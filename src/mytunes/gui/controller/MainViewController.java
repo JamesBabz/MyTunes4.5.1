@@ -167,8 +167,7 @@ public class MainViewController implements Initializable
             isPlaying = false;
             processVolumeData();
             searchOnUpdate();
-        } 
-        catch (Exception ex)
+        } catch (Exception ex)
         {
             Alert alert = new Alert(AlertType.ERROR);
             alert.setTitle("Error Dialog");
@@ -280,10 +279,7 @@ public class MainViewController implements Initializable
             {
                 for (Song song : selectedPlaylist.getSongList())
                 {
-                    if (!currentSongsInView.contains(song))
-                    {
-                        currentSongsInView.add(song);
-                    }
+                    currentSongsInView.add(song);
                 }
             }
             hasBrowseButtonBeenClicked = false;
@@ -684,11 +680,27 @@ public class MainViewController implements Initializable
                 @Override
                 public void handle(ActionEvent event)
                 {
-                    if (!playlist.getSongList().contains(selectedSong))
+                    
+                    if (playlist.getSongList().contains(selectedSong))
+                    {
+
+                        Alert alert = new Alert(AlertType.CONFIRMATION);
+                        alert.setTitle("Confirmation Dialog");
+                        alert.setHeaderText("This song is already in this playlist");
+                        alert.setContentText("Do you want add it again");
+
+                        Optional<ButtonType> result = alert.showAndWait();
+                        if (result.get() == ButtonType.OK)
+                        {
+                            playlistManager.addSong(playlist, selectedSong);
+                        } else
+                        {
+                            alert.close();
+                        }
+                    } else
                     {
                         playlistManager.addSong(playlist, selectedSong);
                     }
-
                     tablePlaylists.refresh();
                 }
             });
