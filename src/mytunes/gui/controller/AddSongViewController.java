@@ -28,7 +28,7 @@ import org.jaudiotagger.tag.TagException;
 /**
  * FXML Controller class
  *
- * @author James
+ * @author Stephan Fuhlendorff, Jacob Enemark, Thomas Hansen, Simon Birkedal
  */
 public class AddSongViewController implements Initializable
 {

@@ -15,7 +15,7 @@ import mytunes.dal.SongDAO;
 
 /**
  *
- * @author James
+ * @author Stephan Fuhlendorff, Jacob Enemark, Thomas Hansen, Simon Birkedal
  */
 public class SongModel {
 

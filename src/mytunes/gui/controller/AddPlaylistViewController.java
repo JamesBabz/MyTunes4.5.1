@@ -15,7 +15,7 @@ import mytunes.gui.model.PlaylistModel;
 /**
  * FXML Controller class
  *
- * @author James
+ *@author Stephan Fuhlendorff, Jacob Enemark, Thomas Hansen, Simon Birkedal
  */
 public class AddPlaylistViewController implements Initializable {
 

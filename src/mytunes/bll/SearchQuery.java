@@ -6,7 +6,7 @@ import mytunes.be.Song;
 
 /**
  * A class that handles the search function.
- * @author Simon Birkedal
+ *@author Stephan Fuhlendorff, Jacob Enemark, Thomas Hansen, Simon Birkedal
  */
 public class SearchQuery
 { 

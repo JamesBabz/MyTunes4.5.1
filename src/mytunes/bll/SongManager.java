@@ -13,7 +13,7 @@ import mytunes.be.Song;
  * it and perform tasks such as play, pause & stop as well as retreive information
  * about the current song.
  *
- * @author Simon Birkedal
+ * @author Stephan Fuhlendorff, Jacob Enemark, Thomas Hansen, Simon Birkedal
  */
 public class SongManager {
 

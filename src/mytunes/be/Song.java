@@ -6,7 +6,7 @@ import java.util.UUID;
 /**
  * The song business entity is a class which contains all information regarding
  * a song. Including its title, duration, artist, etc.
- * @author Simon Birkedal
+ * @author Stephan Fuhlendorff, Jacob Enemark, Thomas Hansen, Simon Birkedal
  */
 public class Song implements Serializable {
 

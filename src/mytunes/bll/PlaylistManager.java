@@ -5,7 +5,7 @@ import mytunes.be.Song;
 
 /**
  * Adds and removes songs to and from a playlist.
- * @author Simon Birkedal
+ * @author Stephan Fuhlendorff, Jacob Enemark, Thomas Hansen, Simon Birkedal
  */
 public class PlaylistManager {
 
