@@ -87,22 +87,15 @@ public class PlaylistModel {
             playlists.addAll(playlistDAO.readObjectData("PlaylistData.dat"));
     }
 
-    public void savePlaylistData() throws Exception
+    public void savePlaylistData() throws IOException
     {
-        try
+        ArrayList<Playlist> playlistToSave = new ArrayList<>();
+        for (Playlist playlist : playlists)
         {
-            ArrayList<Playlist> playlistToSave = new ArrayList<>();
-            for (Playlist playlist : playlists)
-            {
-                playlistToSave.add(playlist);
+            playlistToSave.add(playlist);
 
-            }
-            playlistDAO.writeObjectData(playlistToSave, "PlaylistData.dat");
         }
-        catch (IOException ex)
-        {
-            throw new Exception("Can't save playlist");
-        }
+        playlistDAO.writeObjectData(playlistToSave, "PlaylistData.dat");
     }
 
     public Playlist getContextPlaylist() {
