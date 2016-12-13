@@ -34,8 +34,15 @@ public class MyTunes extends Application {
         stage.show();
         stage.setOnCloseRequest((final WindowEvent args) ->
         {
-            SongModel.getInstance().saveSongData();
-            PlaylistModel.getInstance().savePlaylistData();
+            try
+            {
+                SongModel.getInstance().saveSongData();
+                PlaylistModel.getInstance().savePlaylistData();
+            }
+            catch (Exception ex)
+            {
+                System.out.println("Data couldn't be saved.");
+            }
             System.exit(0);
         });
     }
