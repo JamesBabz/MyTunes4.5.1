@@ -1,39 +1,42 @@
 package mytunes.bll;
 
 import java.io.File;
+import java.util.List;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 import mytunes.be.Song;
 
 /**
- * This is the class which contains all the operational logic for the songs.
+ * This is the class which contains all the operational logic for the current song.
  * Whenever a new instance of SongManager is instantiated the developer can call
- * it and perform tasks such as play, pause & stop.
+ * it and perform tasks such as play, pause & stop as well as retreive information
+ * about the current song.
  *
- * @author Simon Birkedal
+ * @author Stephan Fuhlendorff, Jacob Enemark, Thomas Hansen, Simon Birkedal
  */
 public class SongManager {
 
-    private Song currentSong;
+    private Song song;
     private MediaPlayer player;
 
     /**
      * Plays the specified song if any is found.
      *
      * @param song The song to be played.
+     * @param overwrite
      */
     public void playSong(Song song, boolean overwrite)
     {
-        if (currentSong == null || overwrite)
+        pauseSong();
+        if (this.song == null || overwrite)
         {
-            currentSong = song;
-            File soundFile = new File(currentSong.getPath());
+            this.song = song;
+            File soundFile = new File(this.song.getPath());
             Media media = new Media(soundFile.toURI().toString());
             player = new MediaPlayer(media);
         }
         player.play();
-
     }
 
     /**
@@ -41,7 +44,7 @@ public class SongManager {
      */
     public void pauseSong()
     {
-        if (currentSong != null)
+        if (song != null)
         {
             player.pause();
         }
@@ -54,7 +57,7 @@ public class SongManager {
      */
     public Song getCurrentlyPlayingSong()
     {
-        return this.currentSong;
+        return this.song;
     }
 
     /**
@@ -67,19 +70,31 @@ public class SongManager {
         return player.getTotalDuration();
     }
 
+    /**
+     * Gets the time elapsed of the currently playing song.
+     * @return Returns a duration value representing the time elapsed.
+     */
     public Duration getSongTimeElapsed()
     {
         return player.getCurrentTime();
     }
 
+    /**
+     * Gets the mediaplayer.
+     * @return Returns the current media player.
+     */
     public MediaPlayer getMediaPlayer()
     {
         return player;
     }
-
-    public MediaPlayer getPlayer()
+    
+    /**
+     * Adjusts the volume.
+     * @param value The new value to set the volume equal to. Ranging from 0.0 to
+     * 1.0
+     */
+    public void adjustVolume(double value)
     {
-        return player;
+        player.setVolume(value);
     }
-
 }

@@ -32,14 +32,11 @@ public class MyTunes extends Application {
         stage.setMinWidth(820);
         stage.setMinHeight(600);
         stage.show();
-        stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(final WindowEvent arg0)
-            {
-                SongModel.getInstance().saveSongData();
-                PlaylistModel.getInstance().savePlaylistData();
-                System.exit(0);
-            }
+        stage.setOnCloseRequest((final WindowEvent args) ->
+        {
+            SongModel.getInstance().saveSongData();
+            PlaylistModel.getInstance().savePlaylistData();
+            System.exit(0);
         });
     }
 
