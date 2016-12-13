@@ -57,10 +57,6 @@ import mytunes.bll.TimeFormat;
 import mytunes.dal.ReadSongProperty;
 import mytunes.gui.model.PlaylistModel;
 import mytunes.gui.model.SongModel;
-import org.jaudiotagger.audio.exceptions.CannotReadException;
-import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
-import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
-import org.jaudiotagger.tag.TagException;
 
 /**
  * This class is the main controller class, it handles all the interactions
@@ -211,11 +207,7 @@ public class MainViewController implements Initializable
             searchOnUpdate();
         } catch (Exception ex)
         {
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setTitle("Error Dialog");
-            alert.setContentText("Could not load data");
-
-            alert.showAndWait();
+            showErrorDialog("Initializing Error", "INITIALIZE FAIILED!", "We coulnd't load the required data.");
         }
     }
 
@@ -235,13 +227,6 @@ public class MainViewController implements Initializable
     public void handlePreviousSong()
     {
         prevNextSong(false);
-    }
-
-    @FXML
-    private void handleEditSong()
-    {
-        songModel.setContextSong(selectedSong);
-        loadStage("EditSongView.fxml");
     }
 
     @FXML
@@ -479,39 +464,62 @@ public class MainViewController implements Initializable
     }
 
     @FXML
-    private void handleDragDropped(DragEvent event) throws CannotReadException, IOException, TagException, ReadOnlyFileException, InvalidAudioFrameException
+    private void handleDragDropped(DragEvent event)
     {
-        Dragboard db = event.getDragboard();
-        boolean success = false;
-        if (db.hasFiles())
+        try
         {
-            success = true;
-            for (File file : db.getFiles())
+            Dragboard db = event.getDragboard();
+            boolean success = false;
+            if (db.hasFiles())
             {
-                String filePath = file.getPath();
-                rsp = new ReadSongProperty(filePath);
-
-                String title = rsp.getTitle();
-                String artist = rsp.getArtist();
-                String genre = rsp.getGenre();
-                String duration = TimeFormat.formatDouble(rsp.getDuration());
-                Song song = new Song(title, artist, genre, duration, 0, filePath);
-                if (selectedPlaylist != null && !hasBrowseButtonBeenClicked)
+                success = true;
+                for (File file : db.getFiles())
                 {
-                    playlistManager.addSong(selectedPlaylist, song);
-                    songModel.getSongs().add(song);
-                    tableSongs.getItems().add(song);
+                    String filePath = file.getPath();
+                    rsp = new ReadSongProperty(filePath);
+                    
+                    String title = rsp.getTitle();
+                    String artist = rsp.getArtist();
+                    String genre = rsp.getGenre();
+                    String duration = TimeFormat.formatDouble(rsp.getDuration());
+                    Song song = new Song(title, artist, genre, duration, 0, filePath);
+                    if (selectedPlaylist != null && !hasBrowseButtonBeenClicked)
+                    {
+                        playlistManager.addSong(selectedPlaylist, song);
+                        songModel.getSongs().add(song);
+                        tableSongs.getItems().add(song);
+                    }
+                    else
+                    {
+                        songModel.getSongs().add(song);
+                    }
                 }
-                else
-                {
-                    songModel.getSongs().add(song);
-                }
+                tablePlaylists.refresh();
+                tableSongs.refresh();
             }
-            tablePlaylists.refresh();
-            tableSongs.refresh();
+            event.setDropCompleted(success);
+            event.consume();
         }
-        event.setDropCompleted(success);
-        event.consume();
+        catch (Exception ex)
+        {
+            showErrorDialog("Unexpected File", "NOT SUPPORTED!", "Sorry, we only support MP3 Files at the moment.");
+        }
+    }
+    
+    /**
+     * Shows an information dialog.
+     * @param title The Window Title.
+     * @param header The header title.
+     * @param message The messageinformation.
+     */
+    public void showErrorDialog(String title, String header, String message)
+    {
+        Alert alert = new Alert(AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(message);
+
+        alert.showAndWait();
     }
 
     /**
@@ -519,7 +527,14 @@ public class MainViewController implements Initializable
      */
     private void addSong()
     {
-        loadStage("AddSongView.fxml");
+        try
+        {
+            loadStage("AddSongView.fxml");
+        }
+        catch (IOException ex)
+        {
+            showErrorDialog("I/O Exception", "DATASTREAM FAILED!", "The requested view could not be loaded.");
+        }
     }
 
     /**
@@ -527,7 +542,14 @@ public class MainViewController implements Initializable
      */
     private void addPlaylist()
     {
-        loadStage("AddPlaylistView.fxml");
+        try
+        {
+            loadStage("AddPlaylistView.fxml");
+        }
+        catch (IOException ex)
+        {
+            showErrorDialog("I/O Exception", "DATASTREAM FAILED!", "The requested view could not be loaded.");
+        }
     }
 
     /**
@@ -536,7 +558,28 @@ public class MainViewController implements Initializable
     private void renamePlaylist()
     {
         playlistModel.setContextPlaylist(selectedPlaylist);
-        loadStage("RenamePlaylistView.fxml");
+        try
+        {
+            loadStage("RenamePlaylistView.fxml");
+        }
+        catch (IOException ex)
+        {
+            showErrorDialog("I/O Exception", "DATASTREAM FAILED!", "Please select a playlist first.");
+        }
+    }
+    
+    @FXML
+    private void handleEditSong()
+    {
+        songModel.setContextSong(selectedSong);
+        try
+        {
+            loadStage("EditSongView.fxml");
+        }
+        catch (IOException ex)
+        {
+            showErrorDialog("I/O Exception", "DATASTREAM FAILED!", "Please select a song first.");
+        }
     }
 
     /**
@@ -595,25 +638,19 @@ public class MainViewController implements Initializable
      *
      * @param viewName The view file to be loaded.
      */
-    private void loadStage(String viewName)
+    private void loadStage(String viewName) throws IOException
     {
-        try
-        {
-            primaryStage = (Stage) tableSongs.getScene().getWindow();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/mytunes/gui/view/" + viewName));
-            Parent root = loader.load();
+        primaryStage = (Stage) tableSongs.getScene().getWindow();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/mytunes/gui/view/" + viewName));
+        Parent root = loader.load();
 
-            Stage newStage = new Stage();
-            newStage.setScene(new Scene(root));
+        Stage newStage = new Stage();
+        newStage.setScene(new Scene(root));
 
-            newStage.initModality(Modality.WINDOW_MODAL);
-            newStage.initOwner(primaryStage);
+        newStage.initModality(Modality.WINDOW_MODAL);
+        newStage.initOwner(primaryStage);
 
-            newStage.show();
-        } catch (IOException iOException)
-        {
-            System.out.println(iOException.getMessage());
-        }
+        newStage.show();
     }
 
     /**
@@ -776,17 +813,21 @@ public class MainViewController implements Initializable
                     
                     if (playlist.getSongList().contains(selectedSong))
                     {
-
                         Alert alert = new Alert(AlertType.CONFIRMATION);
                         alert.setTitle("Confirmation Dialog");
-                        alert.setHeaderText("This song is already in this playlist");
-                        alert.setContentText("Do you want add it again");
+                        alert.setHeaderText("Song Duplicate");                        
+                        alert.setContentText(playlist.getTitle() + " already contains a song with the title " + selectedSong.getTitle() + ". \n\nAre you sure you want to add another copy of it?");
+                        alert.getButtonTypes().remove(ButtonType.OK);
+                        alert.getButtonTypes().remove(ButtonType.CANCEL);
+                        alert.getButtonTypes().add(ButtonType.YES);
+                        alert.getButtonTypes().add(ButtonType.NO);
+
 
                         Optional<ButtonType> result = alert.showAndWait();
-                        if (result.get() == ButtonType.OK)
+                        if (result.get() == ButtonType.YES)
                         {
                             playlistManager.addSong(playlist, selectedSong);
-                        } else
+                        } else if (result.get() == ButtonType.NO)
                         {
                             alert.close();
                         }
