@@ -448,7 +448,20 @@ public class MainViewController implements Initializable
         isRepeatToggled = !isRepeatToggled;
     }
     
-    
+    @FXML
+    private void handleEditSong()
+    {
+        songModel.setContextSong(selectedSong);
+        try
+        {
+            loadStage("EditSongView.fxml");
+        }
+        catch (IOException ex)
+        {
+            showErrorDialog("I/O Exception", "DATASTREAM FAILED!", "Please select a song first.");
+        }
+    }
+     
     @FXML
     private void handleDragOver(DragEvent event)
     {
@@ -507,7 +520,7 @@ public class MainViewController implements Initializable
     }
     
     /**
-     * Shows an information dialog.
+     * Shows an error dialog.
      * @param title The Window Title.
      * @param header The header title.
      * @param message The messageinformation.
@@ -565,20 +578,6 @@ public class MainViewController implements Initializable
         catch (IOException ex)
         {
             showErrorDialog("I/O Exception", "DATASTREAM FAILED!", "Please select a playlist first.");
-        }
-    }
-    
-    @FXML
-    private void handleEditSong()
-    {
-        songModel.setContextSong(selectedSong);
-        try
-        {
-            loadStage("EditSongView.fxml");
-        }
-        catch (IOException ex)
-        {
-            showErrorDialog("I/O Exception", "DATASTREAM FAILED!", "Please select a song first.");
         }
     }
 
@@ -816,18 +815,13 @@ public class MainViewController implements Initializable
                         Alert alert = new Alert(AlertType.CONFIRMATION);
                         alert.setTitle("Confirmation Dialog");
                         alert.setHeaderText("Song Duplicate");                        
-                        alert.setContentText(playlist.getTitle() + " already contains a song with the title " + selectedSong.getTitle() + ". \n\nAre you sure you want to add another copy of it?");
-                        alert.getButtonTypes().remove(ButtonType.OK);
-                        alert.getButtonTypes().remove(ButtonType.CANCEL);
-                        alert.getButtonTypes().add(ButtonType.YES);
-                        alert.getButtonTypes().add(ButtonType.NO);
-
+                        alert.setContentText(playlist.getTitle() + " already contains a song with the title " + selectedSong.getTitle() + ". \n\nYou are about to make a copy of it.");
 
                         Optional<ButtonType> result = alert.showAndWait();
-                        if (result.get() == ButtonType.YES)
+                        if (result.get() == ButtonType.OK)
                         {
                             playlistManager.addSong(playlist, selectedSong);
-                        } else if (result.get() == ButtonType.NO)
+                        } else
                         {
                             alert.close();
                         }
