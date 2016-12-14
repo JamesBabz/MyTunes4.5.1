@@ -13,7 +13,7 @@ import mytunes.dal.PlaylistDAO;
  * @author Stephan Fuhlendorff, Jacob Enemark, Thomas Hansen, Simon Birkedal
  */
 public class PlaylistModel {
-    
+
     private Playlist contextPlaylist;
     private PlaylistDAO playlistDAO;
     private static PlaylistModel instance;
@@ -21,6 +21,7 @@ public class PlaylistModel {
     ObservableList<Playlist> playlists = FXCollections.observableArrayList();
     ObservableList<String> playlistTitles = FXCollections.observableArrayList();
 
+    //Singleton
     public static PlaylistModel getInstance()
     {
         if (instance == null)
@@ -45,6 +46,7 @@ public class PlaylistModel {
         return playlists;
     }
 
+    //Sets the titles for the playlists for use in the view
     public void setPlaylistTitles()
     {
         playlistTitles.clear();
@@ -54,9 +56,14 @@ public class PlaylistModel {
         }
 
     }
-    
-    public void renamePlaylist(Playlist contextPlaylist){
-            for (int i = 0; i < playlists.size(); i++)
+
+    /*
+    Gets the playlist and new name from the renameview and replaces the current
+    playlist with the new one with the new name
+     */
+    public void renamePlaylist(Playlist contextPlaylist)
+    {
+        for (int i = 0; i < playlists.size(); i++)
         {
 
             Playlist playlist = playlists.get(i);
@@ -83,8 +90,8 @@ public class PlaylistModel {
 
     public void loadPlaylistData() throws FileNotFoundException
     {
-            playlists.clear();
-            playlists.addAll(playlistDAO.readObjectData("PlaylistData.dat"));
+        playlists.clear();
+        playlists.addAll(playlistDAO.readObjectData("PlaylistData.dat"));
     }
 
     public void savePlaylistData() throws IOException
@@ -98,11 +105,12 @@ public class PlaylistModel {
         playlistDAO.writeObjectData(playlistToSave, "PlaylistData.dat");
     }
 
-    public Playlist getContextPlaylist() {
+    public Playlist getContextPlaylist()
+    {
         return contextPlaylist;
     }
-    
-     public void setContextPlaylist(Playlist contextPlaylist)
+
+    public void setContextPlaylist(Playlist contextPlaylist)
     {
         this.contextPlaylist = contextPlaylist;
     }
