@@ -1,24 +1,27 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mytunes.be;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.io.Serializable;
 import java.util.UUID;
+import mytunes.bll.TimeFormat;
+import mytunes.dal.ReadSongProperty;
+import org.jaudiotagger.audio.exceptions.CannotReadException;
+import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
+import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
+import org.jaudiotagger.tag.TagException;
 
 /**
- *
- * @author Simon Birkedal
+ * The playlist business entity contains all information regarding a playlist;
+ * Title, Total Duration and what songs have been added to the playlist.
+ * @author Stephan Fuhlendorff, Jacob Enemark, Thomas Hansen, Simon Birkedal
  */
 public class Playlist implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private final UUID id;
     private String title;
-    private double totalDuration;
+    private String totalDuration;
     private ArrayList<Song> songList;
     private int numSongs;
 
@@ -69,8 +72,28 @@ public class Playlist implements Serializable {
      *
      * @return Returns the total duration.
      */
-    public double getTotalDuration()
+    public String getTotalDuration()
     {
+        int summedDuration = 0;
+        
+        for (Song song : songList)
+        {
+            try
+            {
+                summedDuration += new ReadSongProperty(song.getPath()).getDuration();
+            }
+            catch (CannotReadException | TagException ex)
+            {
+                summedDuration += 0;
+            }
+            catch (ReadOnlyFileException | InvalidAudioFrameException | IOException ex)
+            {
+                System.out.println(ex.getCause());
+            }
+        }
+        
+        totalDuration = TimeFormat.formatDouble(summedDuration);
+        
         return totalDuration;
     }
 

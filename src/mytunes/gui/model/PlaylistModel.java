@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package mytunes.gui.model;
 
 import java.io.FileNotFoundException;
@@ -15,10 +10,11 @@ import mytunes.dal.PlaylistDAO;
 
 /**
  *
- * @author James
+ * @author Stephan Fuhlendorff, Jacob Enemark, Thomas Hansen, Simon Birkedal
  */
 public class PlaylistModel {
-
+    
+    private Playlist contextPlaylist;
     private PlaylistDAO playlistDAO;
     private static PlaylistModel instance;
 
@@ -58,6 +54,21 @@ public class PlaylistModel {
         }
 
     }
+    
+    public void renamePlaylist(Playlist contextPlaylist){
+            for (int i = 0; i < playlists.size(); i++)
+        {
+
+            Playlist playlist = playlists.get(i);
+            if (playlist.getId() == contextPlaylist.getId())
+            {
+
+                playlist.setTitle(contextPlaylist.getTitle());
+                //Replace the playlist
+                playlists.set(i, playlist);
+            }
+        }
+    }
 
     public ObservableList<String> getPlaylistTitles()
     {
@@ -72,26 +83,28 @@ public class PlaylistModel {
 
     public void loadPlaylistData() throws FileNotFoundException
     {
-        playlists.clear();
-        playlists.addAll(playlistDAO.readObjectData("PlaylistData.dat"));
+            playlists.clear();
+            playlists.addAll(playlistDAO.readObjectData("PlaylistData.dat"));
     }
 
-    public void savePlaylistData()
+    public void savePlaylistData() throws IOException
     {
-        try
+        ArrayList<Playlist> playlistToSave = new ArrayList<>();
+        for (Playlist playlist : playlists)
         {
-            ArrayList<Playlist> playlistToSave = new ArrayList<>();
-            for (Playlist playlist : playlists)
-            {
-                playlistToSave.add(playlist);
+            playlistToSave.add(playlist);
 
-            }
-            playlistDAO.writeObjectData(playlistToSave, "PlaylistData.dat");
         }
-        catch (IOException ex)
-        {
-            // TODO: exception handling.
-        }
+        playlistDAO.writeObjectData(playlistToSave, "PlaylistData.dat");
+    }
+
+    public Playlist getContextPlaylist() {
+        return contextPlaylist;
+    }
+    
+     public void setContextPlaylist(Playlist contextPlaylist)
+    {
+        this.contextPlaylist = contextPlaylist;
     }
 
 }

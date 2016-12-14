@@ -15,7 +15,7 @@ import mytunes.dal.SongDAO;
 
 /**
  *
- * @author James
+ * @author Stephan Fuhlendorff, Jacob Enemark, Thomas Hansen, Simon Birkedal
  */
 public class SongModel {
 
@@ -97,21 +97,15 @@ public class SongModel {
         songs.addAll(songDAO.readObjectData("SongsData.dat"));
     }
 
-    public void saveSongData()
+    public void saveSongData() throws IOException
     {
-        try
+
+        ArrayList<Song> songsToSave = new ArrayList<>();
+        for (Song song : songs)
         {
-            ArrayList<Song> songsToSave = new ArrayList<>();
-            for (Song song : songs)
-            {
-                songsToSave.add(song);
-            }
-            songDAO.writeObjectData(songsToSave, "SongsData.dat");
+            songsToSave.add(song);
         }
-        catch (IOException ex)
-        {
-            // TODO: exception handling.
-        }
+        songDAO.writeObjectData(songsToSave, "SongsData.dat");
     }
 
 }
