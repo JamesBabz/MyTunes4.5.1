@@ -25,6 +25,7 @@ public class SongModel {
 
     private static SongModel instance;
 
+    //Singleton
     public static SongModel getInstance()
     {
         if (instance == null)
@@ -47,6 +48,10 @@ public class SongModel {
 
     }
 
+    /*
+    Gets the song with new text from the edit view and replaces the original 
+    one in the list of current songs
+     */
     public void editSong(Song contextSong)
     {
 
@@ -91,12 +96,14 @@ public class SongModel {
         this.contextSong = contextSong;
     }
 
+    //Loads songs from .dat file
     public void loadSongData() throws FileNotFoundException
     {
         songs.clear();
         songs.addAll(songDAO.readObjectData("SongsData.dat"));
     }
 
+    //Save songs to .dat file
     public void saveSongData() throws IOException
     {
 

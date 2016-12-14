@@ -64,8 +64,7 @@ import mytunes.gui.model.SongModel;
  *
  * @author Stephan Fuhlendorff, Jacob Enemark, Thomas Hansen, Simon Birkedal
  */
-public class MainViewController implements Initializable
-{
+public class MainViewController implements Initializable {
 
     private final SongManager songManager;
     private final PlaylistManager playlistManager;
@@ -87,7 +86,6 @@ public class MainViewController implements Initializable
     private boolean isRepeatToggled;
     private final Random rand;
     private ReadSongProperty rsp;
-
 
     @FXML
     private AnchorPane mainPane;
@@ -205,7 +203,8 @@ public class MainViewController implements Initializable
             isPlaying = false;
             processVolumeData();
             searchOnUpdate();
-        } catch (Exception ex)
+        }
+        catch (Exception ex)
         {
             showErrorDialog("Initializing Error", "INITIALIZE FAIILED!", "We coulnd't load the required data.");
         }
@@ -286,7 +285,8 @@ public class MainViewController implements Initializable
         if (!isPlaying)
         {
             songManager.playSong(selectedSong, false);
-        } else
+        }
+        else
         {
             songManager.pauseSong();
         }
@@ -324,7 +324,8 @@ public class MainViewController implements Initializable
             image = new Image(getClass().getResourceAsStream("/mytunes/images/mute.png"));
             sliderVolume.setValue(0.0);
             isMuted = true;
-        } else
+        }
+        else
         {
             image = new Image(getClass().getResourceAsStream("/mytunes/images/unmute.png"));
             sliderVolume.setValue(sliderVolumeValue);
@@ -447,7 +448,7 @@ public class MainViewController implements Initializable
     {
         isRepeatToggled = !isRepeatToggled;
     }
-    
+
     @FXML
     private void handleEditSong()
     {
@@ -461,7 +462,7 @@ public class MainViewController implements Initializable
             showErrorDialog("I/O Exception", "DATASTREAM FAILED!", "Please select a song first.");
         }
     }
-     
+
     @FXML
     private void handleDragOver(DragEvent event)
     {
@@ -490,7 +491,7 @@ public class MainViewController implements Initializable
                 {
                     String filePath = file.getPath();
                     rsp = new ReadSongProperty(filePath);
-                    
+
                     String title = rsp.getTitle();
                     String artist = rsp.getArtist();
                     String genre = rsp.getGenre();
@@ -518,9 +519,10 @@ public class MainViewController implements Initializable
             showErrorDialog("Unexpected File", "NOT SUPPORTED!", "Sorry, we only support MP3 Files at the moment.");
         }
     }
-    
+
     /**
      * Shows an error dialog.
+     *
      * @param title The Window Title.
      * @param header The header title.
      * @param message The messageinformation.
@@ -587,10 +589,11 @@ public class MainViewController implements Initializable
      */
     private void searchOnUpdate()
     {
-        txtSearch.textProperty().addListener((ObservableValue<? extends String> listener, String oldQuery, String newQuery) -> 
-        {
-            searchedSongs.setAll(searchQuery.search(getCurrentSongs(), newQuery));
-            tableSongs.setItems(searchedSongs);
+        txtSearch.textProperty().addListener((ObservableValue<? extends String> listener, String oldQuery, String newQuery)
+                -> 
+                {
+                    searchedSongs.setAll(searchQuery.search(getCurrentSongs(), newQuery));
+                    tableSongs.setItems(searchedSongs);
         });
     }
 
@@ -606,7 +609,8 @@ public class MainViewController implements Initializable
         if (selectedPlaylist == null || hasBrowseButtonBeenClicked)
         {
             currentSongsInView.setAll(songModel.getSongs());
-        } else // If we are in a playlist's view.
+        }
+        else // If we are in a playlist's view.
         {
             currentSongsInView.setAll(selectedPlaylist.getSongList());
         }
@@ -620,15 +624,16 @@ public class MainViewController implements Initializable
      */
     private void processVolumeData()
     {
-        sliderVolume.valueProperty().addListener((ObservableValue<? extends Number> listener, Number oldVal, Number newVal) -> 
-        {
-            if (songManager.getMediaPlayer() != null)
-            {
-                songManager.adjustVolume(newVal.doubleValue() / 100);
-                Image image = new Image(getClass().getResourceAsStream("/mytunes/images/unmute.png"));
-                imgMute.setImage(image);
-                isMuted = false;
-            }
+        sliderVolume.valueProperty().addListener((ObservableValue<? extends Number> listener, Number oldVal, Number newVal)
+                -> 
+                {
+                    if (songManager.getMediaPlayer() != null)
+                    {
+                        songManager.adjustVolume(newVal.doubleValue() / 100);
+                        Image image = new Image(getClass().getResourceAsStream("/mytunes/images/unmute.png"));
+                        imgMute.setImage(image);
+                        isMuted = false;
+                    }
         });
     }
 
@@ -673,7 +678,8 @@ public class MainViewController implements Initializable
             image = new Image(getClass().getResourceAsStream("/mytunes/images/play.png"));
             imgPlay.setImage(image);
             isPlaying = false;
-        } else
+        }
+        else
         {
             image = new Image(getClass().getResourceAsStream("/mytunes/images/pause.png"));
             imgPlay.setImage(image);
@@ -688,26 +694,26 @@ public class MainViewController implements Initializable
      */
     private void processMediaUpdates()
     {
-        songManager.getMediaPlayer().currentTimeProperty().addListener((ObservableValue<? extends Duration> listener, Duration oldVal, Duration newVal) -> 
-        {
-            long minutes = (long) newVal.toMinutes();
-            long seconds = (long) (newVal.toSeconds() % 60);
-            this.lblTimeElapsed.setText(String.format("%02d:%02d", minutes, seconds));
-
-            double timeElapsed = newVal.toMillis() / songManager.getSongLength().toMillis();
-            this.barMediaTimer.setProgress(timeElapsed);
-
-            if (songManager.getCurrentlyPlayingSong().getDuration().isEmpty() && barMediaTimer.getProgress() >= 0.999
-                    || !songManager.getCurrentlyPlayingSong().getDuration().isEmpty() && barMediaTimer.getProgress() >= 1)
-            {
-                if (isRepeatToggled)
+        songManager.getMediaPlayer().currentTimeProperty().addListener((ObservableValue<? extends Duration> listener, Duration oldVal, Duration newVal)
+                -> 
                 {
-                    prevNextSong(false);
-                } else
-                {
-                    prevNextSong(true);
-                }
-            }
+                    this.lblTimeElapsed.setText(TimeFormat.formatDouble(newVal.toSeconds()));
+
+                    double timeElapsed = newVal.toMillis() / songManager.getSongLength().toMillis();
+                    this.barMediaTimer.setProgress(timeElapsed);
+
+                    if (songManager.getCurrentlyPlayingSong().getDuration().isEmpty() && barMediaTimer.getProgress() >= 0.999
+                            || !songManager.getCurrentlyPlayingSong().getDuration().isEmpty() && barMediaTimer.getProgress() >= 1)
+                    {
+                        if (isRepeatToggled)
+                        {
+                            prevNextSong(false);
+                        }
+                        else
+                        {
+                            prevNextSong(true);
+                        }
+                    }
         });
 
         lblSongPlaying.setText(songManager.getCurrentlyPlayingSong().getTitle());
@@ -731,12 +737,14 @@ public class MainViewController implements Initializable
             {
                 selectedPlaylist.getSongList().remove(selectedSong);
                 tableSongs.getItems().remove(selectedSong);
-            } else
+            }
+            else
             {
                 tableSongs.getItems().remove(selectedSong);
                 deleteFromLibrary();
             }
-        } else
+        }
+        else
         {
             alert.close();
         }
@@ -775,7 +783,8 @@ public class MainViewController implements Initializable
         {
             songModel.loadSongData();
             playlistModel.loadPlaylistData();
-        } catch (FileNotFoundException ex)
+        }
+        catch (FileNotFoundException ex)
         {
             System.out.println("Generating song and playlist .dat files...");
             songModel.saveSongData();
@@ -804,28 +813,29 @@ public class MainViewController implements Initializable
         for (Playlist playlist : playlists)
         {
             MenuItem item = new MenuItem(playlist.getTitle());
-            item.setOnAction(new EventHandler<ActionEvent>()
-            {
+            item.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent event)
                 {
-                    
+
                     if (playlist.getSongList().contains(selectedSong))
                     {
                         Alert alert = new Alert(AlertType.CONFIRMATION);
                         alert.setTitle("Confirmation Dialog");
-                        alert.setHeaderText("Song Duplicate");                        
+                        alert.setHeaderText("Song Duplicate");
                         alert.setContentText(playlist.getTitle() + " already contains a song with the title " + selectedSong.getTitle() + ". \n\nYou are about to make a copy of it.");
 
                         Optional<ButtonType> result = alert.showAndWait();
                         if (result.get() == ButtonType.OK)
                         {
                             playlistManager.addSong(playlist, selectedSong);
-                        } else
+                        }
+                        else
                         {
                             alert.close();
                         }
-                    } else
+                    }
+                    else
                     {
                         playlistManager.addSong(playlist, selectedSong);
                     }
@@ -863,23 +873,28 @@ public class MainViewController implements Initializable
             if (isShuffleToggled)
             {
                 selectionModel.clearAndSelect(rand.nextInt(tableSongs.getItems().size()));
-            } else if (selectedSongIndex == tableSongsTotalItems || selectedSong == null)
+            }
+            else if (selectedSongIndex == tableSongsTotalItems || selectedSong == null)
             {
                 selectionModel.clearAndSelect(0);
-            } else
+            }
+            else
             {
                 selectionModel.clearAndSelect(selectedSongIndex + 1);
             }
-        } else if (songManager.getSongTimeElapsed().toMillis() <= 3500.0)
+        }
+        else if (songManager.getSongTimeElapsed().toMillis() <= 3500.0)
         {
             if (selectedSongIndex == 0 || selectedSong == null)
             {
                 selectionModel.clearAndSelect(tableSongsTotalItems);
-            } else
+            }
+            else
             {
                 selectionModel.clearAndSelect(selectedSongIndex - 1);
             }
-        } else
+        }
+        else
         {
             selectionModel.clearAndSelect(selectedSongIndex);
         }
@@ -910,7 +925,8 @@ public class MainViewController implements Initializable
         {
             changeIndex = currIndex - 1;
             change = true;
-        } else if (!up && currIndex != tableSongs.getItems().size() - 1)
+        }
+        else if (!up && currIndex != tableSongs.getItems().size() - 1)
         {
             changeIndex = currIndex + 1;
             change = true;
@@ -928,5 +944,5 @@ public class MainViewController implements Initializable
                 selectedPlaylist.getSongList().set(currIndex, changeSong);
             }
         }
-    }  
+    }
 }
