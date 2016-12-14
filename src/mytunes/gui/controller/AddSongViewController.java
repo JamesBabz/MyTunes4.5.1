@@ -89,7 +89,7 @@ public class AddSongViewController implements Initializable
     }
 
     @FXML
-    public void addSong()
+    private void addSong()
     {
         String title = txtTitle.getText();
         String artist = txtArtist.getText();

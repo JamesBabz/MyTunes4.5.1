@@ -82,11 +82,11 @@ public class Playlist implements Serializable {
             {
                 summedDuration += new ReadSongProperty(song.getPath()).getDuration();
             }
-            catch (CannotReadException | TagException ex)
+            catch (CannotReadException ex)
             {
                 summedDuration += 0;
             }
-            catch (ReadOnlyFileException | InvalidAudioFrameException | IOException ex)
+            catch (ReadOnlyFileException | InvalidAudioFrameException | IOException | TagException ex)
             {
                 System.out.println(ex.getCause());
             }
