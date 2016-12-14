@@ -88,73 +88,73 @@ public class MainViewController implements Initializable {
     private ReadSongProperty rsp;
 
     @FXML
-    private AnchorPane mainPane;
+    public AnchorPane mainPane;
     @FXML
-    private ImageView imgMute;
+    public ImageView imgMute;
     @FXML
-    private ImageView imgPlay;
+    public ImageView imgPlay;
     @FXML
-    private TextField txtSearch;
+    public TextField txtSearch;
     @FXML
-    private Label lblSongPlaying;
+    public Label lblSongPlaying;
     @FXML
-    private Label lblSongDuration;
+    public Label lblSongDuration;
     @FXML
-    private Label lblTimeElapsed;
+    public Label lblTimeElapsed;
     @FXML
-    private Slider sliderVolume;
+    public Slider sliderVolume;
     @FXML
-    private ProgressBar barMediaTimer;
+    public ProgressBar barMediaTimer;
     @FXML
-    private TableView<Song> tableSongs;
+    public TableView<Song> tableSongs;
     @FXML
-    private TableColumn<Song, String> colTitle;
+    public TableColumn<Song, String> colTitle;
     @FXML
-    private TableColumn<Song, String> colArtist;
+    public TableColumn<Song, String> colArtist;
     @FXML
-    private TableColumn<Song, String> colGenre;
+    public TableColumn<Song, String> colGenre;
     @FXML
-    private TableColumn<Song, Double> colDuration;
+    public TableColumn<Song, Double> colDuration;
     @FXML
-    private TableColumn<Song, Double> colRating;
+    public TableColumn<Song, Double> colRating;
     @FXML
-    private TableView<Playlist> tablePlaylists;
+    public TableView<Playlist> tablePlaylists;
     @FXML
-    private TableColumn<Playlist, String> colPlaylist;
+    public TableColumn<Playlist, String> colPlaylist;
     @FXML
-    private TableColumn<Playlist, String> colTime;
+    public TableColumn<Playlist, String> colTime;
     @FXML
-    private Menu menuAddToPL;
+    public Menu menuAddToPL;
     @FXML
-    private Menu fileAddToPL;
+    public Menu fileAddToPL;
     @FXML
-    private ContextMenu contextSong;
+    public ContextMenu contextSong;
     @FXML
-    private MenuItem itemAddSong;
+    public MenuItem itemAddSong;
     @FXML
-    private MenuItem itemEdit;
+    public MenuItem itemEdit;
     @FXML
-    private MenuItem itemDelete;
+    public MenuItem itemDelete;
     @FXML
-    private MenuBar menuBar;
+    public MenuBar menuBar;
     @FXML
-    private Button btnPrev;
+    public Button btnPrev;
     @FXML
-    private ImageView imgPrev;
+    public ImageView imgPrev;
     @FXML
-    private Button btnPlay;
+    public Button btnPlay;
     @FXML
-    private Button btnNext;
+    public Button btnNext;
     @FXML
-    private ImageView imgNext;
+    public ImageView imgNext;
     @FXML
-    private Hyperlink hlinkBrowse;
+    public Hyperlink hlinkBrowse;
     @FXML
-    private Label lblClearSearch;
+    public Label lblClearSearch;
     @FXML
-    private ImageView imgShuffle;
+    public ImageView imgShuffle;
     @FXML
-    private ImageView imgRepeat;
+    public ImageView imgRepeat;
 
     /**
      * The default contructor for this class.
@@ -211,19 +211,19 @@ public class MainViewController implements Initializable {
     }
 
     @FXML
-    public void handleAddSongButton()
+    private void handleAddSongButton()
     {
         addSong();
     }
 
     @FXML
-    public void handleNextSong()
+    private void handleNextSong()
     {
         prevNextSong(true);
     }
 
     @FXML
-    public void handlePreviousSong()
+    private void handlePreviousSong()
     {
         prevNextSong(false);
     }
@@ -232,6 +232,7 @@ public class MainViewController implements Initializable {
     private void handleDeleteSong()
     {
         deleteSong();
+        
     }
 
     @FXML
@@ -253,7 +254,7 @@ public class MainViewController implements Initializable {
      * @param event The mouse event to listen for.
      */
     @FXML
-    public void handleOnMousePressed(MouseEvent event)
+    private void handleOnMousePressed(MouseEvent event)
     {
         selectedSong = tableSongs.selectionModelProperty().getValue().getSelectedItem();
 
@@ -271,7 +272,7 @@ public class MainViewController implements Initializable {
     }
 
     @FXML
-    public void handlePlayButton()
+    private void handlePlayButton()
     {
         // Making sure the song is never null before trying to play a song.
         if (selectedSong == null)
@@ -375,7 +376,7 @@ public class MainViewController implements Initializable {
     }
 
     @FXML
-    public void macros(KeyEvent key)
+    private void macros(KeyEvent key)
     {
         if (key.getCode() == KeyCode.SPACE)
         {
@@ -519,6 +520,59 @@ public class MainViewController implements Initializable {
             showErrorDialog("Unexpected File", "NOT SUPPORTED!", "Sorry, we only support MP3 Files at the moment.");
         }
     }
+    
+    
+    @FXML
+    private void handleAbout()
+    {
+        String contentText = "Current functions in MyTunes are:\n"
+                + "• In the file menu you can:\n"
+                + "\t› Create a new song\n"
+                + "\t› Create a new playlist\n"
+                + "\t› Add a song to a playlist\n"
+                + "• In the edit menu you can:\n"
+                + "\t› Edit a song\n"
+                + "\t› Move a song up or down\n"
+                + "\t› Delete a song\n"
+                + "\t› Rename a playlist\n"
+                + "\t› Delete a playlist\n"
+                + "• In the help menu you can:\n"
+                + "\t› Open this dialogue\n"
+                + "• In the top of the application you are able to:\n"
+                + "\t› Play and pause a song\n"
+                + "\t› Play the next or a previous song\n"
+                + "\t› Shuffle or repeat songs\n"
+                + "\t› Change volume including mute\n"
+                + "\t› See and set the elapsed time of a song\n"
+                + "\t› Search for a song or playlist\n"
+                + "• On the left hand side you see:\n"
+                + "\t› A browse button for showing your library of songs\n"
+                + "\t› All playlists and their total time\n"
+                + "\t› If you right-click you can add, rename and delete a playlist\n"
+                + "• The main view contains the songs\n"
+                + "\t› If you select a playlist it will show the songs in that playlist\n"
+                + "\t› If you right-click you can add, rename and delete songs\n"
+                + "\t› You can also add the selected song to a playlist\n"
+                + "• The following shortcuts works in this version:\n"
+                + "\t› Add song - ctrl+N\n"
+                + "\t› Add playlist ctrl+P\n"
+                + "\t› Delete selected - Del\n"
+                + "\t› Move song up - ctrl+Up\n"
+                + "\t› Move song down - ctrl+Down\n"
+                + "\n"
+                + "\n"
+                + "\n"
+                + "Made by Thomas Hansen, Jacob Enemark, Simon Birkedal and Stephan Fuhlendorff"
+                + "\n";
+        Alert about = new Alert(AlertType.INFORMATION);
+        about.setTitle("About");
+        about.setHeaderText("About MyTunes 4.5.1");
+        about.setContentText(contentText);
+        about.getDialogPane().setPrefWidth(480);
+        about.resizableProperty().set(true);
+        about.showAndWait();
+        
+    }
 
     /**
      * Shows an error dialog.
@@ -527,7 +581,7 @@ public class MainViewController implements Initializable {
      * @param header The header title.
      * @param message The messageinformation.
      */
-    public void showErrorDialog(String title, String header, String message)
+    private void showErrorDialog(String title, String header, String message)
     {
         Alert alert = new Alert(AlertType.ERROR);
         alert.setTitle(title);
@@ -660,7 +714,7 @@ public class MainViewController implements Initializable {
     /**
      * Update playlists.
      */
-    public void setPlaylists()
+    private void setPlaylists()
     {
         playlists = playlistModel.getPlaylists();
     }
@@ -749,6 +803,7 @@ public class MainViewController implements Initializable {
             alert.close();
         }
         tablePlaylists.refresh();
+        selectedSong = tableSongs.selectionModelProperty().getValue().getSelectedItem();
     }
 
     /**
@@ -914,7 +969,7 @@ public class MainViewController implements Initializable {
      * @param up If true the song is moved up the list, otherwise the song is
      * moved down the list.
      */
-    public void moveSong(boolean up)
+    private void moveSong(boolean up)
     {
         System.out.println(tableSongs.getSelectionModel().getSelectedIndex());
         int currIndex = tableSongs.getSelectionModel().getSelectedIndex();
@@ -945,4 +1000,5 @@ public class MainViewController implements Initializable {
             }
         }
     }
+
 }
