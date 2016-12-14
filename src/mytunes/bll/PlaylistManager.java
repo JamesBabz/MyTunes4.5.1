@@ -20,17 +20,5 @@ public class PlaylistManager {
         // TODO: Add exception handling.
         playlist.getSongList().add(song);
     }
-
-    /**
-     * Removes a specified song from a specified playlist.
-     *
-     * @param playlist A playlist to remove the song from.
-     * @param song The song to be removed from the playlist.
-     */
-    public void removeSong(Playlist playlist, Song song)
-    {
-        // TODO: Add exception handling.
-        playlist.getSongList().remove(song);
-    }
-
+    
 }
