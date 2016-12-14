@@ -520,6 +520,59 @@ public class MainViewController implements Initializable {
             showErrorDialog("Unexpected File", "NOT SUPPORTED!", "Sorry, we only support MP3 Files at the moment.");
         }
     }
+    
+    
+    @FXML
+    private void handleAbout()
+    {
+        String contentText = "Current functions in MyTunes are:\n"
+                + "• In the file menu you can:\n"
+                + "\t› Create a new song\n"
+                + "\t› Create a new playlist\n"
+                + "\t› Add a song to a playlist\n"
+                + "• In the edit menu you can:\n"
+                + "\t› Edit a song\n"
+                + "\t› Move a song up or down\n"
+                + "\t› Delete a song\n"
+                + "\t› Rename a playlist\n"
+                + "\t› Delete a playlist\n"
+                + "• In the help menu you can:\n"
+                + "\t› Open this dialogue\n"
+                + "• In the top of the application you are able to:\n"
+                + "\t› Play and pause a song\n"
+                + "\t› Play the next or a previous song\n"
+                + "\t› Shuffle or repeat songs\n"
+                + "\t› Change volume including mute\n"
+                + "\t› See and set the elapsed time of a song\n"
+                + "\t› Search for a song or playlist\n"
+                + "• On the left hand side you see:\n"
+                + "\t› A browse button for showing your library of songs\n"
+                + "\t› All playlists and their total time\n"
+                + "\t› If you right-click you can add, rename and delete a playlist\n"
+                + "• The main view contains the songs\n"
+                + "\t› If you select a playlist it will show the songs in that playlist\n"
+                + "\t› If you right-click you can add, rename and delete songs\n"
+                + "\t› You can also add the selected song to a playlist\n"
+                + "• The following shortcuts works in this version:\n"
+                + "\t› Add song - ctrl+N\n"
+                + "\t› Add playlist ctrl+P\n"
+                + "\t› Delete selected - Del\n"
+                + "\t› Move song up - ctrl+Up\n"
+                + "\t› Move song down - ctrl+Down\n"
+                + "\n"
+                + "\n"
+                + "\n"
+                + "Made by Thomas Hansen, Jacob Enemark, Simon Birkedal and Stephan Fuhlendorff"
+                + "\n";
+        Alert about = new Alert(AlertType.INFORMATION);
+        about.setTitle("About");
+        about.setHeaderText("About MyTunes 4.5.1");
+        about.setContentText(contentText);
+        about.getDialogPane().setPrefWidth(480);
+        about.resizableProperty().set(true);
+        about.showAndWait();
+        
+    }
 
     /**
      * Shows an error dialog.
@@ -947,4 +1000,5 @@ public class MainViewController implements Initializable {
             }
         }
     }
+
 }
