@@ -232,6 +232,7 @@ public class MainViewController implements Initializable {
     private void handleDeleteSong()
     {
         deleteSong();
+        
     }
 
     @FXML
@@ -749,6 +750,7 @@ public class MainViewController implements Initializable {
             alert.close();
         }
         tablePlaylists.refresh();
+        selectedSong = tableSongs.selectionModelProperty().getValue().getSelectedItem();
     }
 
     /**
